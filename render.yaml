@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: act-longevity-ai-mvp
+    runtime: python
+    plan: free
+    buildCommand: npm install && npm run build && python3 -m pip install -r backend/requirements.txt
+    startCommand: python3 backend/app.py
+    envVars:
+      - key: MONGODB_DB
+        value: longevity_app
+      - key: MONGODB_URI
+        sync: false
