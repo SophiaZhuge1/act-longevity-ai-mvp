@@ -4,6 +4,9 @@ import {
   Activity,
   Brain,
   BookOpen,
+  CheckCircle2,
+  ClipboardList,
+  FileText,
   HeartPulse,
   Home,
   MapPin,
@@ -67,20 +70,19 @@ const demoAnswers = {
 };
 
 const scoreMeta = [
-  ['cardiometabolic', 'Heart & BP', HeartPulse],
-  ['mobility_independence', 'Movement', Activity],
-  ['sleep_recovery', 'Sleep', Moon],
-  ['nutrition_vitality', 'Food & Energy', Salad],
-  ['mental_wellbeing', 'Mood', Sparkles],
-  ['cognition_sensory', 'Memory & Senses', Brain],
-  ['social_connection', 'Connection', Users],
-  ['preventive_care', 'Prevention', ShieldCheck],
+  ['staying_healthy', 'Staying Healthy', HeartPulse],
+  ['independence', 'Independence', Activity],
+  ['wellbeing', 'Wellbeing', Sparkles],
+  ['accommodation', 'Quality of Accommodation', Home],
+  ['financial_wellbeing', 'Financial Wellbeing', ShieldCheck],
 ];
 
 function App() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState(demoAnswers);
   const [profile, setProfile] = useState({ name: 'Margaret', age_band: '70-90', postcode: 'SW1A' });
+  const [consent, setConsent] = useState({ report: true, analytics: true });
+  const [waitlist, setWaitlist] = useState({ join: true, email: 'margaret@example.com', organisation: '', interest_type: 'Individual' });
   const [dashboard, setDashboard] = useState(null);
   const [chatText, setChatText] = useState('Can you suggest gentle exercises for me?');
   const [chatAnswer, setChatAnswer] = useState('');
@@ -104,10 +106,14 @@ function App() {
   }, [questions]);
 
   async function submitAssessment() {
+    if (!consent.report) {
+      setNotice('Please confirm consent to create your summary report.');
+      return;
+    }
     try {
       setBusy(true);
-      setNotice('Building your dashboard now...');
-      const payload = { profile: { ...profile, postcode: answers.postcode || profile.postcode }, answers };
+      setNotice('Preparing your ACT taster report...');
+      const payload = { profile: { ...profile, postcode: answers.postcode || profile.postcode }, answers, consent, waitlist };
       const response = await fetch(`${API}/api/assessments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,10 +124,10 @@ function App() {
       }
       const data = await response.json();
       setDashboard(data);
-      setNotice('Dashboard ready. Your health profile has been updated.');
+      setNotice('Your summary report is ready.');
       window.setTimeout(() => dashboardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
     } catch (error) {
-      setNotice('The dashboard could not be built. Please check that the Python backend is running on port 8000.');
+      setNotice('The report could not be built. Please check that the Python backend is running on port 8000.');
     } finally {
       setBusy(false);
     }
@@ -144,12 +150,17 @@ function App() {
     <main className="app">
       <section className="topbar">
         <div>
-          <p className="eyebrow">ACT Longevity AI MVP</p>
-          <h1>A wellness dashboard designed for people 70 and over.</h1>
+          <p className="eyebrow">ACT Assess Free Taster</p>
+          <h1>Take a 10-minute wellness check.</h1>
           <p className="lede">
-            Answer a short check-in, then turn the result into a plain-English health persona,
-            radar profile, practical swaps, local resources and follow-up support.
+            Get a plain-English summary of your priorities for support, prevention opportunities,
+            clinical risks to discuss with your doctor and a Healthy Longevity spider-gram.
           </p>
+          <div className="trust-strip">
+            <span><CheckCircle2 size={18} /> Wellness, not diagnosis</span>
+            <span><CheckCircle2 size={18} /> Built on ACT Assess</span>
+            <span><CheckCircle2 size={18} /> AI support coming next</span>
+          </div>
         </div>
         <div className="profile-card">
           <label>
@@ -160,7 +171,9 @@ function App() {
             Postcode area
             <input value={answers.postcode || ''} onChange={(e) => setAnswers({ ...answers, postcode: e.target.value })} />
           </label>
-          <button onClick={submitAssessment} disabled={busy}>{busy ? 'Building...' : 'Build My Dashboard'}</button>
+          <WaitlistForm waitlist={waitlist} setWaitlist={setWaitlist} />
+          <ConsentBox consent={consent} setConsent={setConsent} />
+          <button onClick={submitAssessment} disabled={busy}>{busy ? 'Preparing...' : 'Get My Summary Report'}</button>
           {notice && <p className={notice.includes('could not') ? 'notice error' : 'notice'}>{notice}</p>}
         </div>
       </section>
@@ -173,7 +186,7 @@ function App() {
       {dashboard && (
         <section className="chat-panel">
           <div>
-            <p className="eyebrow">Follow-up Chat</p>
+            <p className="eyebrow">Premium Preview</p>
             <h2>Ask about your plan</h2>
           </div>
           <div className="chat-row">
@@ -184,6 +197,68 @@ function App() {
         </section>
       )}
     </main>
+  );
+}
+
+function WaitlistForm({ waitlist, setWaitlist }) {
+  return (
+    <div className="waitlist-box">
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={waitlist.join}
+          onChange={(e) => setWaitlist({ ...waitlist, join: e.target.checked })}
+        />
+        <span>Join the early interest list for ACT Healthy Longevity support</span>
+      </label>
+      {waitlist.join && (
+        <div className="waitlist-fields">
+          <label>
+            Email
+            <input value={waitlist.email} onChange={(e) => setWaitlist({ ...waitlist, email: e.target.value })} />
+          </label>
+          <label>
+            Organisation, if relevant
+            <input value={waitlist.organisation} onChange={(e) => setWaitlist({ ...waitlist, organisation: e.target.value })} placeholder="Optional" />
+          </label>
+          <div className="chips compact">
+            {['Individual', 'Organisation'].map((option) => (
+              <button
+                className={waitlist.interest_type === option ? 'chip active' : 'chip'}
+                key={option}
+                onClick={() => setWaitlist({ ...waitlist, interest_type: option })}
+                type="button"
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ConsentBox({ consent, setConsent }) {
+  return (
+    <div className="consent-box">
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={consent.report}
+          onChange={(e) => setConsent({ ...consent, report: e.target.checked })}
+        />
+        <span>I agree that ACT can use my answers to create this taster report.</span>
+      </label>
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={consent.analytics}
+          onChange={(e) => setConsent({ ...consent, analytics: e.target.checked })}
+        />
+        <span>ACT may use anonymised answers to understand population wellbeing trends.</span>
+      </label>
+    </div>
   );
 }
 
@@ -240,9 +315,11 @@ function Dashboard({ dashboard, dashboardRef }) {
   const [speaking, setSpeaking] = useState(false);
 
   function recommendationText() {
-    const intro = `Hi ${dashboard.profile.name}. Here is your friendly health summary. ${dashboard.persona}`;
-    const recs = dashboard.recommendations.map((item) => `${item.title}. ${item.body}`).join(' ');
-    return `${intro} Your suggested next steps are: ${recs}`;
+    const intro = `Hi ${dashboard.profile.name}. Here is your ACT taster summary. ${dashboard.persona}`;
+    const priorities = dashboard.support_priorities.map((item) => `${item.title}. ${item.body}`).join(' ');
+    const prevention = dashboard.prevention_opportunities.map((item) => `${item.title}. ${item.body}`).join(' ');
+    const risks = dashboard.clinical_risks.map((item) => `${item.title}. ${item.body}`).join(' ');
+    return `${intro} Priorities for support: ${priorities}. Prevention opportunities: ${prevention}. Clinical points to discuss: ${risks}`;
   }
 
   function speakRecommendations() {
@@ -266,9 +343,9 @@ function Dashboard({ dashboard, dashboardRef }) {
   if (!dashboard) {
     return (
       <section className="panel empty" ref={dashboardRef}>
-        <Home size={36} />
-        <h2>Your dashboard will appear here</h2>
-        <p>Use the demo answers or change them, then build the dashboard.</p>
+        <FileText size={36} />
+        <h2>Your taster report will appear here</h2>
+        <p>Use the demo answers or change them, then create the ACT summary report.</p>
       </section>
     );
   }
@@ -276,8 +353,8 @@ function Dashboard({ dashboard, dashboardRef }) {
     <section className="panel dashboard" ref={dashboardRef} tabIndex="-1">
       <div className="panel-head">
         <div>
-          <p className="eyebrow">Health Dashboard</p>
-          <h2>{dashboard.profile.name}'s profile</h2>
+          <p className="eyebrow">ACT Taster Report</p>
+          <h2>{dashboard.profile.name}'s Healthy Longevity Profile</h2>
         </div>
         <span className="badge"><MapPin size={14} /> {dashboard.profile.postcode}</span>
       </div>
@@ -305,6 +382,27 @@ function Dashboard({ dashboard, dashboardRef }) {
           </article>
         ))}
       </div>
+      <ReportSection
+        icon={ClipboardList}
+        eyebrow="Your Priorities"
+        title="Priorities for support"
+        items={dashboard.support_priorities}
+        emptyText="No major support priorities were identified from these answers."
+      />
+      <ReportSection
+        icon={ShieldCheck}
+        eyebrow="WHO Guidance"
+        title="Prevention opportunities"
+        items={dashboard.prevention_opportunities}
+        emptyText="Your answers suggest your core prevention routines are broadly on track."
+      />
+      <ReportSection
+        icon={HeartPulse}
+        eyebrow="For Your Doctor"
+        title="Clinical risks to discuss"
+        items={dashboard.clinical_risks}
+        emptyText="No major clinical discussion points were identified from this taster."
+      />
       <h3>Local resources near you</h3>
       <div className="resources">
         {dashboard.resources.map((item) => (
@@ -330,6 +428,28 @@ function Dashboard({ dashboard, dashboardRef }) {
               <em>{item.why || 'Follow-along videos to review with comfort and care.'}</em>
             </span>
           </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ReportSection({ icon: Icon, eyebrow, title, items = [], emptyText }) {
+  return (
+    <section className="report-section">
+      <div className="report-heading">
+        <span className="card-icon"><Icon size={22} /></span>
+        <div>
+          <p className="eyebrow">{eyebrow}</p>
+          <h3>{title}</h3>
+        </div>
+      </div>
+      <div className="report-list">
+        {(items.length ? items : [{ title: 'All steady', body: emptyText }]).map((item) => (
+          <article key={item.title}>
+            <strong>{item.title}</strong>
+            <p>{item.body}</p>
+          </article>
         ))}
       </div>
     </section>
@@ -374,6 +494,8 @@ function ResourceIcon({ type, icon }) {
     shopping: ShoppingBasket,
     meal: Utensils,
     meal_delivery: Utensils,
+    home: Home,
+    finance: ShieldCheck,
   }[key] || Sparkles;
   return (
     <span className="card-icon">
@@ -385,8 +507,8 @@ function ResourceIcon({ type, icon }) {
 function Radar({ scores }) {
   const size = 430;
   const center = size / 2;
-  const radius = 128;
-  const labelRadius = 178;
+  const radius = 122;
+  const labelRadius = 172;
   const points = scoreMeta.map(([key], index) => {
     const angle = -Math.PI / 2 + (2 * Math.PI * index) / scoreMeta.length;
     const value = (scores[key] || 0) / 100;
@@ -394,7 +516,7 @@ function Radar({ scores }) {
   });
   return (
     <div className="radar-wrap">
-      <svg viewBox={`0 0 ${size} ${size}`} className="radar" role="img" aria-label="Eight category health radar chart">
+      <svg viewBox={`0 0 ${size} ${size}`} className="radar" role="img" aria-label="Five dimension Healthy Longevity spider-gram">
         {[0.25, 0.5, 0.75, 1].map((scale) => (
           <polygon key={scale} points={scoreMeta.map((_, index) => {
             const angle = -Math.PI / 2 + (2 * Math.PI * index) / scoreMeta.length;
@@ -410,7 +532,7 @@ function Radar({ scores }) {
           const angle = -Math.PI / 2 + (2 * Math.PI * index) / scoreMeta.length;
           const x = center + Math.cos(angle) * labelRadius;
           const y = center + Math.sin(angle) * labelRadius;
-          const lines = label.split(' & ');
+          const lines = label.split(' ');
           return (
             <g key={key}>
               {lines.map((line, lineIndex) => (

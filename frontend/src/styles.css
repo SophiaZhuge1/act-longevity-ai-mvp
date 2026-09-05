@@ -6,14 +6,14 @@
 :root {
   --ink: #17202e;
   --muted: #667085;
-  --paper: #fffdf8;
+  --paper: #fbfbf6;
   --panel: #ffffff;
-  --blue: #245a78;
-  --blue-soft: #dbeef5;
-  --leaf: #5b7f62;
-  --leaf-soft: #e6f0e5;
-  --rose: #a6525b;
-  --gold: #ba8a2f;
+  --blue: #062838;
+  --blue-soft: #e7f5f6;
+  --leaf: #07966b;
+  --leaf-soft: #e8f7ef;
+  --rose: #8d4350;
+  --gold: #b88726;
   --line: #d8ddd5;
   --shadow: 0 18px 50px rgba(23, 32, 46, 0.12);
 }
@@ -25,10 +25,9 @@
 body {
   margin: 0;
   background:
-    linear-gradient(135deg, rgba(219, 238, 245, 0.9), rgba(255, 253, 248, 0.85) 46%, rgba(230, 240, 229, 0.95)),
-    radial-gradient(circle at 15% 20%, rgba(186, 138, 47, 0.12), transparent 30%);
+    linear-gradient(135deg, rgba(231, 245, 246, 0.92), rgba(251, 251, 246, 0.9) 48%, rgba(232, 247, 239, 0.95));
   color: var(--ink);
-  font-family: Aptos, Georgia, "Times New Roman", serif;
+  font-family: Aptos, "Aptos Display", Georgia, serif;
 }
 
 button,
@@ -50,6 +49,7 @@ input {
   padding: 34px;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
   box-shadow: var(--shadow);
 }
 
@@ -100,6 +100,7 @@ h3 {
 .chat-panel {
   background: var(--panel);
   border: 1px solid var(--line);
+  border-radius: 8px;
   box-shadow: var(--shadow);
 }
 
@@ -143,6 +144,7 @@ input {
 }
 
 button {
+  border-radius: 8px;
   min-height: 52px;
   border: 0;
   background: var(--blue);
@@ -150,6 +152,61 @@ button {
   padding: 0 18px;
   font-weight: 800;
   cursor: pointer;
+}
+
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.trust-strip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #bfe5d5;
+  border-radius: 999px;
+  background: #fff;
+  padding: 9px 12px;
+  color: #153a34;
+  font-weight: 800;
+}
+
+.waitlist-box,
+.consent-box {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf6;
+  padding: 14px;
+}
+
+.waitlist-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.check-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  color: #263242;
+  font-size: 0.97rem;
+  line-height: 1.35;
+}
+
+.check-row input {
+  min-height: 22px;
+  width: 22px;
+  margin: 2px 0 0;
+  accent-color: var(--leaf);
+}
+
+.chips.compact .chip {
+  min-height: 40px;
 }
 
 button:disabled {
@@ -213,6 +270,7 @@ button:disabled {
 .chip {
   min-height: 44px;
   border: 1px solid #ccd5d0;
+  border-radius: 999px;
   background: #fbfaf6;
   color: #283443;
 }
@@ -299,6 +357,48 @@ button:disabled {
   line-height: 1.5;
 }
 
+.report-section {
+  margin: 20px 0;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.report-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.report-heading h3 {
+  margin: 0;
+}
+
+.report-list {
+  display: grid;
+  gap: 10px;
+}
+
+.report-list article {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 14px;
+}
+
+.report-list strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--blue);
+  font-size: 1.04rem;
+}
+
+.report-list p {
+  margin: 0;
+  color: #4f5b67;
+  line-height: 1.45;
+}
+
 .voice-card {
   display: flex;
   justify-content: space-between;
@@ -307,6 +407,7 @@ button:disabled {
   margin-bottom: 18px;
   border: 1px solid #cdddc9;
   background: var(--leaf-soft);
+  border-radius: 8px;
   padding: 16px;
 }
 
@@ -345,6 +446,7 @@ button:disabled {
 .resources a,
 .video-card {
   border: 1px solid var(--line);
+  border-radius: 8px;
   background: #fff;
   padding: 14px;
   color: inherit;
@@ -419,6 +521,7 @@ button:disabled {
   display: inline-flex;
   margin-bottom: 8px;
   border: 1px solid #cbd5d1;
+  border-radius: 999px;
   background: var(--blue-soft);
   padding: 5px 9px;
   color: var(--blue);
@@ -437,6 +540,7 @@ button:disabled {
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--line);
+  border-radius: 8px;
   background: #edf0eb;
 }
 

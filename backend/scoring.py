@@ -76,14 +76,6 @@ def ability_score(value: str) -> int:
 def score_answers(answers: dict) -> dict:
     independence_ids = ["shopping", "dressing", "bathing", "toileting", "transfers", "indoors"]
     independence = round(sum(ability_score(answers.get(k, "")) for k in independence_ids) / len(independence_ids))
-    mobility = round(sum([
-        yes_good(answers.get("falls_3_months", ""), False),
-        yes_good(answers.get("regular_exercise", ""), True),
-        ability_score(answers.get("indoors", "")),
-        ability_score(answers.get("transfers", "")),
-        yes_good(answers.get("moderate_pain", ""), False),
-        independence,
-    ]) / 6)
     sleep_hours = {"Less than 5": 25, "5-6": 48, "6-7": 66, "7-8": 92, "8-9": 82, "More than 9": 56}.get(answers.get("sleep_hours"), 62)
     sleep_quality = {"Refreshed": 96, "Mostly rested": 84, "Mixed": 64, "Usually tired": 40, "Exhausted": 22}.get(answers.get("sleep_quality"), 60)
     nutrition = round(sum([
@@ -114,55 +106,60 @@ def score_answers(answers: dict) -> dict:
         100 if answers.get("bp_checked") == "Yes" else 55 if answers.get("bp_checked") == "Not sure" else 30,
         yes_good(answers.get("teeth_problem", ""), False),
     ]) / 3)
-    cardiometabolic = round(sum([
+    staying_healthy = round(sum([
+        yes_good(answers.get("vision_problem", ""), False),
+        yes_good(answers.get("hearing_problem", ""), False),
+        yes_good(answers.get("teeth_problem", ""), False),
+        yes_good(answers.get("falls_3_months", ""), False),
         yes_good(answers.get("regular_exercise", ""), True),
-        100 if answers.get("bp_checked") == "Yes" else 50,
         nutrition,
+        preventive,
+    ]) / 7)
+    wellbeing = round(sum([
+        mental,
+        social,
         round((sleep_hours + sleep_quality + yes_good(answers.get("sleep_trouble", ""), False)) / 3),
+        yes_good(answers.get("moderate_pain", ""), False),
     ]) / 4)
+    accommodation = yes_good(answers.get("home_problems", ""), False)
+    financial = yes_good(answers.get("finance_problems", ""), False)
     return {
-        "cardiometabolic": cardiometabolic,
-        "mobility_independence": mobility,
-        "sleep_recovery": round((sleep_hours + sleep_quality + yes_good(answers.get("sleep_trouble", ""), False)) / 3),
+        "staying_healthy": staying_healthy,
+        "independence": independence,
+        "wellbeing": wellbeing,
+        "accommodation": accommodation,
+        "financial_wellbeing": financial,
         "nutrition_vitality": nutrition,
-        "mental_wellbeing": mental,
-        "cognition_sensory": cognition,
+        "sleep_recovery": round((sleep_hours + sleep_quality + yes_good(answers.get("sleep_trouble", ""), False)) / 3),
         "social_connection": social,
+        "cognition_sensory": cognition,
         "preventive_care": preventive,
     }
 
 
 def persona_and_recommendations(profile: dict, answers: dict, scores: dict) -> dict:
-    low = sorted(scores.items(), key=lambda x: x[1])[:3]
-    high = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:2]
+    public_scores = {key: scores[key] for key in ["staying_healthy", "independence", "wellbeing", "accommodation", "financial_wellbeing"]}
+    low = sorted(public_scores.items(), key=lambda x: x[1])[:3]
+    high = sorted(public_scores.items(), key=lambda x: x[1], reverse=True)[:2]
     name = profile.get("name") or "This member"
     outcode = (profile.get("postcode") or answers.get("postcode") or "local").split()[0]
     persona = (
-        f"{name} is an older adult in the {profile.get('age_band', '70-90')} age range. "
+        f"{name} has completed the ACT Assess taster for a Healthy Longevity Profile. "
         f"The strongest areas are {high[0][0].replace('_', ' ')} and {high[1][0].replace('_', ' ')}. "
         f"The main opportunity areas are {low[0][0].replace('_', ' ')}, {low[1][0].replace('_', ' ')}, "
-        f"and {low[2][0].replace('_', ' ')}. Recommendations should be gentle, local, practical, and easy to start."
+        f"and {low[2][0].replace('_', ' ')}. The summary is intended to support prevention, confidence and the next conversation with a clinician or trusted supporter."
     )
-    recommendations = []
-    if scores["mobility_independence"] < 68:
-        recommendations += [
-            {"title": "Gentle movement", "body": "Take a short walk, do light stretching, or follow a senior yoga video to maintain flexibility and heart health.", "type": "movement"},
-            {"title": "Balance and strength", "body": "Try heel-to-toe raises, wall push-ups, and sit-to-stand movements from a sturdy chair to help prevent falls.", "type": "movement"},
-        ]
-    if ability_score(answers.get("shopping", "")) < 80:
-        recommendations.append({"title": "Shopping support", "body": "Grocery delivery or meal-prep services can reduce fatigue and make regular nutritious meals easier.", "type": "service"})
-    if scores["sleep_recovery"] < 68:
-        recommendations.append({"title": "Sleep rhythm", "body": "Keep a consistent wake-up time, get morning daylight, and avoid late caffeine to support deeper sleep.", "type": "sleep"})
-    if scores["nutrition_vitality"] < 68:
-        recommendations.append({"title": "Protein and plants", "body": "Add one protein food and one vegetable to lunch or dinner to support muscle, immunity, and steady energy.", "type": "nutrition"})
-    if scores["social_connection"] < 70:
-        recommendations.append({"title": "Local connection", "body": f"Look for older-adult coffee mornings, library groups, walking groups, or gentle classes around {outcode}.", "type": "local"})
-    if scores["preventive_care"] < 75 or scores["cardiometabolic"] < 68:
-        recommendations.append({"title": "Blood pressure basics", "body": "Book a blood pressure check and consider fibre-rich foods, oily fish, and pharmacist guidance before trying supplements.", "type": "prevention"})
+    support_priorities = support_priorities_for(answers, scores, outcode)
+    prevention_opportunities = prevention_opportunities_for(answers, scores)
+    clinical_risks = clinical_risks_for(answers, scores)
+    recommendations = [
+        {"title": item["title"], "body": item["body"], "type": item["type"]}
+        for item in (support_priorities + prevention_opportunities)[:6]
+    ]
     if not recommendations:
-        recommendations.append({"title": "Keep the rhythm", "body": "Maintain regular movement, social contact, vaccinations, blood pressure checks, and a steady sleep routine.", "type": "maintenance"})
+        recommendations.append({"title": "Keep the rhythm", "body": "Keep up regular movement, social contact, vaccinations, blood pressure checks, and a steady sleep routine.", "type": "maintenance"})
     videos = []
-    if scores["mobility_independence"] < 75:
+    if scores["independence"] < 75 or answers.get("falls_3_months") == "Yes":
         videos.extend([
             {
                 "title": "Seated senior exercise",
@@ -227,4 +224,65 @@ def persona_and_recommendations(profile: dict, answers: dict, scores: dict) -> d
                 "why": "Quick meal ideas make it easier to keep nutrition steady without much effort.",
             },
         ]
-    return {"persona": persona, "recommendations": recommendations[:6], "videos": videos, "lowest_categories": [x[0] for x in low]}
+    return {
+        "persona": persona,
+        "recommendations": recommendations[:6],
+        "videos": videos,
+        "lowest_categories": [x[0] for x in low],
+        "support_priorities": support_priorities,
+        "prevention_opportunities": prevention_opportunities,
+        "clinical_risks": clinical_risks,
+    }
+
+
+def support_priorities_for(answers: dict, scores: dict, outcode: str) -> list[dict]:
+    priorities = []
+    if scores["independence"] < 72:
+        priorities.append({"title": "Daily independence support", "body": "A few practical adjustments around shopping, bathing or moving around indoors could make daily routines easier and safer.", "type": "service"})
+    if answers.get("falls_3_months") == "Yes":
+        priorities.append({"title": "Falls prevention support", "body": "A recent fall is worth discussing with a GP, pharmacist or falls service, especially if confidence with movement has changed.", "type": "movement"})
+    if scores["wellbeing"] < 72:
+        priorities.append({"title": "Wellbeing check-in", "body": "Mood, sleep, pain or loneliness may be affecting day-to-day life. A small support plan can help restore confidence.", "type": "local"})
+    if scores["accommodation"] < 70:
+        priorities.append({"title": "Home environment", "body": "Problems with the home can affect safety, comfort and confidence. Local housing or occupational therapy advice may help.", "type": "home"})
+    if scores["financial_wellbeing"] < 70:
+        priorities.append({"title": "Money and benefits advice", "body": "Financial worries can affect wellbeing. Local advice services can help check benefits, bills and support options.", "type": "finance"})
+    if scores["social_connection"] < 70:
+        priorities.append({"title": "Connection nearby", "body": f"Coffee mornings, library groups, walking groups or older-adult activities around {outcode} could help rebuild regular contact.", "type": "social"})
+    return priorities
+
+
+def prevention_opportunities_for(answers: dict, scores: dict) -> list[dict]:
+    opportunities = []
+    if answers.get("regular_exercise") == "No":
+        opportunities.append({"title": "WHO prevention opportunity: movement", "body": "Gentle activity, balance practice and strength work can support independence and reduce preventable decline.", "type": "movement"})
+    if answers.get("vaccinations") in {"No", "Not sure"}:
+        opportunities.append({"title": "Vaccination review", "body": "Checking recommended vaccinations with a pharmacist or GP can reduce avoidable illness risk.", "type": "prevention"})
+    if answers.get("bp_checked") in {"No", "Not sure"}:
+        opportunities.append({"title": "Blood pressure check", "body": "A recent blood pressure reading is a simple prevention step and can highlight risks early.", "type": "prevention"})
+    if scores["nutrition_vitality"] < 72:
+        opportunities.append({"title": "Nutrition opportunity", "body": "Protein-rich meals, vegetables and regular eating can support muscle, immunity and energy.", "type": "nutrition"})
+    if scores["sleep_recovery"] < 68:
+        opportunities.append({"title": "Sleep routine", "body": "A consistent wake time, morning daylight and calmer evenings can support recovery and daytime energy.", "type": "sleep"})
+    return opportunities
+
+
+def clinical_risks_for(answers: dict, scores: dict) -> list[dict]:
+    risks = []
+    if answers.get("falls_3_months") == "Yes":
+        risks.append({"title": "Falls", "body": "A fall in the last three months should be discussed with a doctor or local falls service."})
+    if answers.get("lost_3kg") == "Yes":
+        risks.append({"title": "Unplanned weight loss", "body": "Unintentional weight loss may need a clinical review, especially if appetite or energy has changed."})
+    if answers.get("moderate_pain") == "Yes":
+        risks.append({"title": "Persistent pain", "body": "Moderate or severe pain most days is worth reviewing so it does not limit sleep, movement or mood."})
+    if answers.get("down_depressed") == "Yes":
+        risks.append({"title": "Low mood", "body": "Feeling down, depressed or hopeless is important to discuss with a GP or trusted professional."})
+    if any(answers.get(key) == "Yes" for key in ["memory_more", "forgetting", "confused_day_place", "memory_concern_other"]):
+        risks.append({"title": "Memory or thinking", "body": "Changes in memory or confusion should be discussed with a clinician, especially if others have noticed it too."})
+    if answers.get("vision_problem") == "Yes" or answers.get("hearing_problem") == "Yes":
+        risks.append({"title": "Senses", "body": "Vision or hearing changes can affect independence and falls risk, so an eye or hearing check may help."})
+    if answers.get("bp_checked") in {"No", "Not sure"}:
+        risks.append({"title": "Unknown blood pressure", "body": "Without a recent blood pressure check, an important cardiovascular risk may be missed."})
+    if not risks:
+        risks.append({"title": "No urgent flags from this taster", "body": "No major clinical discussion points were identified from the current answers, but this is not a diagnosis."})
+    return risks[:6]

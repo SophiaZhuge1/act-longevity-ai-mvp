@@ -4,6 +4,7 @@ import json
 import os
 import uuid
 from pathlib import Path
+from datetime import datetime, timezone
 
 from scoring import embedding
 
@@ -29,11 +30,14 @@ class Store:
             except Exception as exc:
                 print(f"MongoDB unavailable, using local JSON store: {exc}")
         if not LOCAL_DB.exists():
-            LOCAL_DB.write_text(json.dumps({"users": [], "vectors": [], "chat": []}, indent=2), encoding="utf-8")
+            LOCAL_DB.write_text(json.dumps({"users": [], "vectors": [], "chat": [], "waitlist": [], "analytics": []}, indent=2), encoding="utf-8")
 
-    def create_user_record(self, profile: dict, answers: dict, scores: dict, ai_result: dict) -> dict:
+    def create_user_record(self, profile: dict, answers: dict, scores: dict, ai_result: dict, consent: dict | None = None, waitlist: dict | None = None) -> dict:
         user_id = profile.get("user_id") or f"U-{uuid.uuid4().hex[:8]}"
         profile = {**profile, "user_id": user_id}
+        consent = consent or {}
+        waitlist = waitlist or {}
+        now = datetime.now(timezone.utc).isoformat()
         vector_text = " ".join([
             ai_result["persona"],
             json.dumps(scores, sort_keys=True),
@@ -49,6 +53,12 @@ class Store:
             "recommendations": ai_result["recommendations"],
             "videos": ai_result["videos"],
             "lowest_categories": ai_result["lowest_categories"],
+            "support_priorities": ai_result["support_priorities"],
+            "prevention_opportunities": ai_result["prevention_opportunities"],
+            "clinical_risks": ai_result["clinical_risks"],
+            "consent": {**consent, "captured_at": now},
+            "waitlist": {**waitlist, "captured_at": now} if waitlist.get("join") else {"join": False},
+            "created_at": now,
         }
         vector_record = {
             "vector_id": f"persona-{user_id}",
@@ -62,13 +72,27 @@ class Store:
                 "scores": scores,
             },
         }
+        analytics_record = anonymised_analytics_record(user_id, profile, answers, scores, ai_result, now)
         if self.db is not None:
             self.db.users.replace_one({"user_id": user_id}, record, upsert=True)
             self.db.vector_documents.replace_one({"vector_id": vector_record["vector_id"]}, vector_record, upsert=True)
+            if consent.get("analytics") is True:
+                self.db.population_analytics.replace_one({"analytics_id": analytics_record["analytics_id"]}, analytics_record, upsert=True)
+            if waitlist.get("join") is True:
+                self.db.waitlist.replace_one({"user_id": user_id}, waitlist_record(user_id, profile, waitlist, now), upsert=True)
         else:
             data = self._read_local()
+            data.setdefault("users", [])
+            data.setdefault("vectors", [])
+            data.setdefault("chat", [])
+            data.setdefault("waitlist", [])
+            data.setdefault("analytics", [])
             data["users"] = [x for x in data["users"] if x["user_id"] != user_id] + [record]
             data["vectors"] = [x for x in data["vectors"] if x["vector_id"] != vector_record["vector_id"]] + [vector_record]
+            if consent.get("analytics") is True:
+                data["analytics"] = [x for x in data["analytics"] if x["analytics_id"] != analytics_record["analytics_id"]] + [analytics_record]
+            if waitlist.get("join") is True:
+                data["waitlist"] = [x for x in data["waitlist"] if x["user_id"] != user_id] + [waitlist_record(user_id, profile, waitlist, now)]
             self._write_local(data)
         return record
 
@@ -106,3 +130,46 @@ class Store:
 
 def cosine(a: list[float], b: list[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
+
+
+def age_band_from_dob(dob: str) -> str:
+    try:
+        year = int(dob.split("-")[0])
+    except Exception:
+        return "unknown"
+    age = datetime.now().year - year
+    if age < 70:
+        return "under_70"
+    if age < 80:
+        return "70_79"
+    if age < 90:
+        return "80_89"
+    return "90_plus"
+
+
+def anonymised_analytics_record(user_id: str, profile: dict, answers: dict, scores: dict, ai_result: dict, created_at: str) -> dict:
+    source = f"{user_id}:{profile.get('postcode') or answers.get('postcode') or ''}"
+    outcode = (profile.get("postcode") or answers.get("postcode") or "").split()[0].upper()
+    return {
+        "analytics_id": f"A-{uuid.uuid5(uuid.NAMESPACE_URL, source).hex[:12]}",
+        "age_band": age_band_from_dob(answers.get("dob", "")),
+        "gender": answers.get("gender", "Prefer not to say"),
+        "outcode": outcode,
+        "living_arrangement": answers.get("living_arrangement"),
+        "scores": {key: scores[key] for key in ["staying_healthy", "independence", "wellbeing", "accommodation", "financial_wellbeing"]},
+        "lowest_categories": ai_result.get("lowest_categories", []),
+        "priority_count": len(ai_result.get("support_priorities", [])),
+        "clinical_risk_count": len(ai_result.get("clinical_risks", [])),
+        "created_at": created_at,
+    }
+
+
+def waitlist_record(user_id: str, profile: dict, waitlist: dict, created_at: str) -> dict:
+    return {
+        "user_id": user_id,
+        "name": profile.get("name", ""),
+        "email": waitlist.get("email", ""),
+        "organisation": waitlist.get("organisation", ""),
+        "interest_type": waitlist.get("interest_type", "Individual"),
+        "created_at": created_at,
+    }

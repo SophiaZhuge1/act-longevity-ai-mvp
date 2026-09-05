@@ -63,9 +63,11 @@ class Handler(BaseHTTPRequestHandler):
             payload = self._read_json()
             profile = payload.get("profile", {})
             answers = payload.get("answers", {})
+            consent = payload.get("consent", {})
+            waitlist = payload.get("waitlist", {})
             scores = score_answers(answers)
             ai_result = persona_and_recommendations(profile, answers, scores)
-            record = store.create_user_record(profile, answers, scores, ai_result)
+            record = store.create_user_record(profile, answers, scores, ai_result, consent, waitlist)
             record["resources"] = resources_for(scores, profile.get("postcode") or answers.get("postcode", ""))
             self._send(record, status=201)
             return

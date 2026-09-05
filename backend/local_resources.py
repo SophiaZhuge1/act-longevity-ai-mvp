@@ -15,10 +15,12 @@ def resources_for(scores: dict, postcode: str = "") -> list[dict]:
     wanted = set()
     if scores.get("social_connection", 100) < 70:
         wanted.update(["social", "learning"])
-    if scores.get("mobility_independence", 100) < 70:
+    if scores.get("independence", 100) < 70:
         wanted.update(["movement", "video"])
     if scores.get("nutrition_vitality", 100) < 70:
         wanted.update(["shopping", "meal_delivery"])
+    if scores.get("financial_wellbeing", 100) < 70:
+        wanted.update(["social"])
     if not wanted:
         wanted.update(["movement", "social", "learning"])
     return [{**r, "postcode_hint": postcode.split()[0] if postcode else "local"} for r in LOCAL_RESOURCES if r["kind"] in wanted]
