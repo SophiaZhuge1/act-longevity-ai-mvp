@@ -42,11 +42,12 @@ def send_report_email(record: dict, pdf_path: Path) -> dict:
 
 
 def smtp_config() -> dict:
+    password = "".join((os.getenv("SMTP_PASSWORD", "")).split())
     return {
         "host": os.getenv("SMTP_HOST", ""),
         "port": int(os.getenv("SMTP_PORT", "587")),
         "username": os.getenv("SMTP_USERNAME", ""),
-        "password": os.getenv("SMTP_PASSWORD", ""),
+        "password": password,
         "from_email": os.getenv("SMTP_FROM", os.getenv("SMTP_USERNAME", "ACT <no-reply@actnow.health>")),
         "use_tls": os.getenv("SMTP_USE_TLS", "true").lower() != "false",
     }
