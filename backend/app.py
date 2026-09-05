@@ -7,6 +7,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from env_loader import load_env_file
+
+load_env_file()
+
 from email_service import send_report_email
 from local_resources import resources_for
 from report_pdf import create_pdf_report

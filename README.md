@@ -131,13 +131,26 @@ The current embeddings are deterministic local mock embeddings. For production, 
 
 The app creates a PDF report after each completed taster assessment. To email the PDF to the user, configure SMTP before starting the backend:
 
+Create a local `.env` file:
+
 ```bash
-export SMTP_HOST="smtp.example.com"
-export SMTP_PORT="587"
-export SMTP_USERNAME="your_smtp_username"
-export SMTP_PASSWORD="your_smtp_password"
-export SMTP_FROM="ACT <hello@actnow.health>"
-export SMTP_USE_TLS="true"
+cp .env.example .env
+```
+
+Then edit `.env` and add your real SMTP details:
+
+```text
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=yourgmail@gmail.com
+SMTP_PASSWORD=your_16_character_app_password
+SMTP_FROM=ACT <yourgmail@gmail.com>
+SMTP_USE_TLS=true
+```
+
+Start the app:
+
+```bash
 npm run start
 ```
 
