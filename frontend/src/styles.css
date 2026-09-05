@@ -411,6 +411,37 @@ button:disabled {
   padding: 16px;
 }
 
+.delivery-card {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.delivery-card.sent {
+  background: var(--leaf-soft);
+  color: #153a34;
+}
+
+.delivery-card.pending {
+  background: #fff8e8;
+  color: #5f4617;
+}
+
+.delivery-card strong,
+.delivery-card span {
+  display: block;
+}
+
+.delivery-card span {
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
 .voice-card > div {
   display: flex;
   gap: 12px;

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "backend": "python3 backend/app.py",
+    "setup:backend": "python3 -m venv .venv && .venv/bin/python -m pip install -r backend/requirements.txt",
+    "backend": ".venv/bin/python backend/app.py",
     "start": "concurrently \"npm run backend\" \"npm run dev\""
   },
   "dependencies": {

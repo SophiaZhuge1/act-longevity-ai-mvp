@@ -214,7 +214,7 @@ function WaitlistForm({ waitlist, setWaitlist }) {
       {waitlist.join && (
         <div className="waitlist-fields">
           <label>
-            Email
+            Email for your PDF report
             <input value={waitlist.email} onChange={(e) => setWaitlist({ ...waitlist, email: e.target.value })} />
           </label>
           <label>
@@ -373,6 +373,7 @@ function Dashboard({ dashboard, dashboardRef }) {
           {speaking ? 'Stop' : 'Listen'}
         </button>
       </div>
+      <DeliveryStatus delivery={dashboard.delivery} />
       <div className="recommendations">
         {dashboard.recommendations.map((item) => (
           <article key={item.title} className="recommendation-card">
@@ -431,6 +432,23 @@ function Dashboard({ dashboard, dashboardRef }) {
         ))}
       </div>
     </section>
+  );
+}
+
+function DeliveryStatus({ delivery }) {
+  if (!delivery) return null;
+  const sent = delivery.email?.sent;
+  const message = sent
+    ? `A PDF copy of this report has been emailed to ${delivery.email.to}.`
+    : delivery.email?.reason || 'The PDF report was prepared, but email has not been sent yet.';
+  return (
+    <div className={sent ? 'delivery-card sent' : 'delivery-card pending'}>
+      <FileText size={22} />
+      <div>
+        <strong>{sent ? 'Report emailed' : 'PDF prepared'}</strong>
+        <span>{message}</span>
+      </div>
+    </div>
   );
 }
 

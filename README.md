@@ -10,6 +10,7 @@ Early implementation of the ACT Assess free taster and Healthy Longevity report.
 - 5-dimension Healthy Longevity spider-gram.
 - Summary report with priorities for support, prevention opportunities and clinical risks to discuss.
 - Consent capture, waitlist capture and anonymised population analytics storage.
+- PDF report generation and optional email delivery when SMTP is configured.
 - Health persona and practical recommendation generation for the later premium AI support flow.
 - Local resource and YouTube search suggestions.
 - MongoDB-compatible vector document storage with local JSON fallback.
@@ -26,6 +27,7 @@ Install the app packages. You only need to do this the first time, or after depe
 
 ```bash
 npm install
+npm run setup:backend
 ```
 
 Start the full local app:
@@ -59,6 +61,7 @@ In Terminal window 1:
 
 ```bash
 npm install
+npm run setup:backend
 npm run backend
 ```
 
@@ -119,8 +122,34 @@ The backend will write to these collections:
 - `users`
 - `vector_documents`
 - `chat`
+- `waitlist`
+- `population_analytics`
 
 The current embeddings are deterministic local mock embeddings. For production, replace them with OpenAI embeddings or MongoDB Atlas Vector Search embeddings.
+
+## Emailing PDF Reports
+
+The app creates a PDF report after each completed taster assessment. To email the PDF to the user, configure SMTP before starting the backend:
+
+```bash
+export SMTP_HOST="smtp.example.com"
+export SMTP_PORT="587"
+export SMTP_USERNAME="your_smtp_username"
+export SMTP_PASSWORD="your_smtp_password"
+export SMTP_FROM="ACT <hello@actnow.health>"
+export SMTP_USE_TLS="true"
+npm run start
+```
+
+For testing, you can use an SMTP provider such as SendGrid, Mailgun, Postmark, Brevo, or a Gmail app password. Do not commit SMTP passwords to GitHub.
+
+If SMTP is not configured, the app still creates the PDF locally in:
+
+```text
+backend/data/reports/
+```
+
+The report page will show whether the email was sent or whether SMTP still needs to be configured.
 
 ## Common Local Issues
 
@@ -143,6 +172,7 @@ When ready, add:
 - `OPENAI_API_KEY` for real persona/recommendation generation and embeddings.
 - A local search provider key such as Google Places, SerpAPI, or Bing Search for postcode-based services.
 - MongoDB Atlas connection string for hosted database and vector search.
+- SMTP credentials for PDF report and waitlist email delivery.
 
 ## Backend Endpoints
 

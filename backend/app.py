@@ -7,7 +7,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from email_service import send_report_email
 from local_resources import resources_for
+from report_pdf import create_pdf_report
 from scoring import ABILITY_OPTIONS, QUESTIONS, persona_and_recommendations, score_answers
 from store import Store
 
@@ -69,6 +71,9 @@ class Handler(BaseHTTPRequestHandler):
             ai_result = persona_and_recommendations(profile, answers, scores)
             record = store.create_user_record(profile, answers, scores, ai_result, consent, waitlist)
             record["resources"] = resources_for(scores, profile.get("postcode") or answers.get("postcode", ""))
+            delivery = prepare_report_delivery(record)
+            record["delivery"] = delivery
+            store.update_user_delivery(record["user_id"], delivery)
             self._send(record, status=201)
             return
         if parsed.path == "/api/chat":
@@ -154,6 +159,22 @@ def chat_answer(user: dict, message: str, matches: list[dict]) -> str:
         return f"This recommendation comes from your profile: {user['persona']}"
     context = matches[0]["text"][:240] if matches else user["persona"]
     return f"Based on your profile, I would keep the next step small and practical. {context}"
+
+
+def prepare_report_delivery(record: dict) -> dict:
+    try:
+        pdf_path = create_pdf_report(record)
+        email_result = send_report_email(record, pdf_path)
+        return {
+            "pdf_created": True,
+            "pdf_path": str(pdf_path),
+            "email": email_result,
+        }
+    except Exception as exc:
+        return {
+            "pdf_created": False,
+            "email": {"sent": False, "reason": f"Report delivery failed: {exc}"},
+        }
 
 
 def run():

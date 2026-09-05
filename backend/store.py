@@ -106,6 +106,17 @@ class Store:
             return self.db.users.find_one({"user_id": user_id}, {"_id": 0})
         return next((x for x in self._read_local()["users"] if x["user_id"] == user_id), None)
 
+    def update_user_delivery(self, user_id: str, delivery: dict) -> None:
+        if self.db is not None:
+            self.db.users.update_one({"user_id": user_id}, {"$set": {"delivery": delivery}})
+            return
+        data = self._read_local()
+        for user in data.get("users", []):
+            if user.get("user_id") == user_id:
+                user["delivery"] = delivery
+                break
+        self._write_local(data)
+
     def vector_search(self, query: str, limit: int = 3) -> list[dict]:
         query_vec = embedding(query)
         vectors = list(self.db.vector_documents.find({}, {"_id": 0})) if self.db is not None else self._read_local()["vectors"]
