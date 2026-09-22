@@ -16,8 +16,8 @@ PUBLIC_SCORE_KEYS = [
     ("staying_healthy", "Staying Healthy"),
     ("independence", "Independence"),
     ("wellbeing", "Wellbeing"),
-    ("accommodation", "Quality of Accommodation"),
-    ("financial_wellbeing", "Financial Wellbeing"),
+    ("social_resources", "Social Resources"),
+    ("clinical_risk", "Clinical Risk"),
 ]
 
 
@@ -57,9 +57,10 @@ def create_pdf_report(record: dict) -> Path:
         Paragraph(escape_text(record.get("persona", "")), styles["BodyText"]),
     ]
 
-    add_section(story, styles, "Priorities for Support", record.get("support_priorities", []))
+    add_section(story, styles, "Clinical Risks to Discuss First", record.get("clinical_risks", []))
+    add_section(story, styles, "Your Three Priorities", record.get("selected_priorities", []))
+    add_section(story, styles, "Other Priorities for Support", record.get("support_priorities", []))
     add_section(story, styles, "Prevention Opportunities", record.get("prevention_opportunities", []))
-    add_section(story, styles, "Clinical Risks to Discuss", record.get("clinical_risks", []))
     add_section(story, styles, "Suggested Local and Home Support", record.get("recommendations", []))
 
     story += [
@@ -97,7 +98,7 @@ def add_section(story: list, styles, title: str, items: list[dict]) -> None:
         return
     for item in items:
         heading = escape_text(item.get("title", "Item"))
-        body = escape_text(item.get("body", ""))
+        body = escape_text(item.get("body") or item.get("detail", ""))
         story.append(Paragraph(f"<b>{heading}</b>", styles["BodyText"]))
         for line in wrap(body, 100) or [""]:
             story.append(Paragraph(line, styles["BodyText"]))

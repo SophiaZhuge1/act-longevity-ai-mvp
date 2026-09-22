@@ -22,8 +22,9 @@ def send_report_email(record: dict, pdf_path: Path) -> dict:
     msg["Subject"] = "Your ACT Healthy Longevity taster report"
     msg["From"] = config["from_email"]
     msg["To"] = recipient
-    msg.set_content(plain_email_body(name, waitlist.get("join") is True))
-    msg.add_alternative(html_email_body(name, waitlist.get("join") is True), subtype="html")
+    access_code = record.get("member_access_code")
+    msg.set_content(plain_email_body(name, waitlist.get("join") is True, access_code))
+    msg.add_alternative(html_email_body(name, waitlist.get("join") is True, access_code), subtype="html")
 
     msg.add_attachment(
         pdf_path.read_bytes(),
@@ -53,12 +54,13 @@ def smtp_config() -> dict:
     }
 
 
-def plain_email_body(name: str, joined_waitlist: bool) -> str:
+def plain_email_body(name: str, joined_waitlist: bool, access_code: str | None = None) -> str:
     waitlist_line = (
         "You are also on the interest list for the new ACT AI-powered Healthy Longevity features, and we will let you know when they are ready to try."
         if joined_waitlist
         else "You have not been added to the AI features waitlist."
     )
+    progress_line = f"Your private ACT progress code is {access_code}. Keep it safe: you will need it with this email address to view future score trends." if access_code else "Your latest assessment has been added to your ACT progress history."
     return f"""Hi {name},
 
 Thank you for completing the ACT Assess taster.
@@ -67,6 +69,8 @@ Your Healthy Longevity report is attached as a PDF. It summarises your prioritie
 
 {waitlist_line}
 
+{progress_line}
+
 This report is for wellness support and is not a diagnosis.
 
 Warm wishes,
@@ -74,12 +78,13 @@ The ACT team
 """
 
 
-def html_email_body(name: str, joined_waitlist: bool) -> str:
+def html_email_body(name: str, joined_waitlist: bool, access_code: str | None = None) -> str:
     waitlist_line = (
         "You are also on the interest list for the new <b>ACT AI-powered Healthy Longevity</b> features, and we will let you know when they are ready to try."
         if joined_waitlist
         else "You have not been added to the AI features waitlist."
     )
+    progress_line = f'Your private ACT progress code is <b style="font-size: 18px; letter-spacing: 1px;">{access_code}</b>. Keep it safe: you will need it with this email address to view future score trends.' if access_code else "Your latest assessment has been added to your ACT progress history."
     return f"""
     <div style="font-family: Georgia, serif; color: #17202e; line-height: 1.5;">
       <h1 style="color: #062838;">Your ACT Healthy Longevity report</h1>
@@ -87,6 +92,7 @@ def html_email_body(name: str, joined_waitlist: bool) -> str:
       <p>Thank you for completing the ACT Assess taster.</p>
       <p>Your Healthy Longevity report is attached as a PDF. It summarises your priorities for support, prevention opportunities, clinical risks to discuss with your doctor and your five-dimension profile.</p>
       <p>{waitlist_line}</p>
+      <p style="background: #e7f5f0; border-left: 4px solid #2f675a; padding: 14px;">{progress_line}</p>
       <p style="color: #667085;">This report is for wellness support and is not a diagnosis.</p>
       <p>Warm wishes,<br>The ACT team</p>
     </div>

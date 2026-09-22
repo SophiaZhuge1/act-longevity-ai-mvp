@@ -3,10 +3,31 @@ services:
     name: act-longevity-ai-mvp
     runtime: python
     plan: free
-    buildCommand: npm install && npm run build && python3 -m pip install -r backend/requirements.txt
+    buildCommand: npm ci && npm run build && python3 -m pip install -r backend/requirements.txt
     startCommand: python3 backend/app.py
+    healthCheckPath: /api/health
     envVars:
       - key: MONGODB_DB
         value: longevity_app
       - key: MONGODB_URI
         sync: false
+      - key: REQUIRE_MONGODB
+        value: "true"
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: SMTP_USE_TLS
+        value: "true"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_CHAT_MODEL
+        value: gpt-5-mini
+      - key: ACT_ADMIN_API_KEY
+        generateValue: true
