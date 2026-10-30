@@ -7,6 +7,9 @@ import {
   TrendingDown, TrendingUp, Users, Utensils, Volume2, X,
 } from 'lucide-react';
 import './styles.css';
+import Marketplace from './Marketplace.jsx';
+import HealthChat from './HealthChat.jsx';
+import { apiFetch, PAGES_MODE } from './pages-api.js';
 
 const API = import.meta.env.VITE_API_URL || '';
 const sectionOrder = ['Staying Healthy', 'Independence', 'Wellbeing'];
@@ -28,6 +31,7 @@ function questionIsVisible(question, answers) {
   return question.show_if_mode === 'any' ? matches.some(Boolean) : matches.every(Boolean);
 }
 function App() {
+  const [activeTab, setActiveTab] = useState('wellness');
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [profile, setProfile] = useState({
@@ -35,7 +39,7 @@ function App() {
     living_arrangement: '', care_support: '', employment_status: '', employment_sector: '',
   });
   const [waitlist, setWaitlist] = useState({ join: true, email: '', organisation: '', interest_type: 'Individual' });
-  const [consent, setConsent] = useState({ report: false, analytics: false });
+  const [consent, setConsent] = useState({ report: false, legal: false, analytics: false });
   const [stage, setStage] = useState('welcome');
   const [activeSection, setActiveSection] = useState(0);
   const [dashboard, setDashboard] = useState(null);
@@ -49,7 +53,7 @@ function App() {
   const resultsRef = useRef(null);
 
   useEffect(() => {
-    fetch(`${API}/api/questions`)
+    apiFetch(`${API}/api/questions`)
       .then((response) => {
         if (!response.ok) throw new Error('Questions unavailable');
         return response.json();
@@ -75,12 +79,16 @@ function App() {
 
   function beginAssessment(event) {
     event.preventDefault();
-    if (!profile.name.trim() || !profile.postcode.trim() || !waitlist.email.trim() || !profile.dob) {
+    if (!profile.name.trim() || !profile.postcode.trim() || (!PAGES_MODE && !waitlist.email.trim()) || !profile.dob) {
       setNotice('Please add your first name, date of birth, email address and postcode.');
       return;
     }
     if (!consent.report) {
       setNotice('Please confirm that ACT may use your answers to create your report.');
+      return;
+    }
+    if (!PAGES_MODE && !consent.legal) {
+      setNotice('Please read and accept the ACT Terms and Conditions, Privacy Policy and Cookie Policy.');
       return;
     }
     setNotice('');
@@ -98,8 +106,8 @@ function App() {
     }
     try {
       setBusy(true);
-      setNotice('Finding the concerns that matter most...');
-      const response = await fetch(`${API}/api/concerns`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) });
+      setNotice(PAGES_MODE ? 'Preparing your plan in this browser. The assessment engine may take a moment to load on your first visit…' : 'Finding the concerns that matter most...');
+      const response = await apiFetch(`${API}/api/concerns`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) });
       if (!response.ok) throw new Error(`Concern review failed: ${response.status}`);
       const data = await response.json();
       setConcerns(data.concerns || []);
@@ -107,8 +115,8 @@ function App() {
       setStage('priorities');
       setNotice('');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch {
-      setNotice('We could not prepare your priorities. Please check the local Python service and try again.');
+    } catch (error) {
+      setNotice(error.message || 'We could not prepare your priorities. Check your connection and try again.');
     } finally { setBusy(false); }
   }
 
@@ -121,7 +129,7 @@ function App() {
     try {
       setBusy(true);
       setNotice('Creating your personal wellness picture...');
-      const response = await fetch(`${API}/api/assessments`, {
+      const response = await apiFetch(`${API}/api/assessments`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: { ...profile, postcode: profile.postcode.toUpperCase() }, answers, selected_priorities: selectedPriorities, consent, waitlist, member_access: memberAccess.authenticated ? memberAccess : undefined }),
       });
@@ -129,7 +137,7 @@ function App() {
       if (!response.ok) throw new Error(data.error || `Assessment failed: ${response.status}`);
       setDashboard(data);
       setHistory(data.history || []);
-      setMemberAccess({ email: waitlist.email, access_code: data.member_access_code || memberAccess.access_code, authenticated: true });
+      if (!PAGES_MODE) setMemberAccess({ email: waitlist.email, access_code: data.member_access_code || memberAccess.access_code, authenticated: true });
       setStage('results');
       setNotice('');
       window.setTimeout(() => resultsRef.current?.focus(), 80);
@@ -146,7 +154,7 @@ function App() {
     }
     try {
       setBusy(true); setNotice('Opening your private progress record...');
-      const response = await fetch(`${API}/api/members/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(memberAccess) });
+      const response = await apiFetch(`${API}/api/members/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(memberAccess) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'We could not open your progress record.');
       const { user_id, ...latestProfile } = data.latest_profile || {};
@@ -164,7 +172,7 @@ function App() {
   function startRetake() {
     window.speechSynthesis?.cancel();
     setDashboard(null); setAnswers({}); setConcerns([]); setSelectedPriorities([]); setActiveSection(0);
-    setConsent({ report: false, analytics: false }); setStage('welcome');
+    setConsent({ report: false, legal: false, analytics: false }); setStage('welcome');
     setNotice('Welcome back. Check your details, confirm consent, then start your next wellness check.');
     window.setTimeout(() => document.getElementById('registration')?.scrollIntoView({ behavior: 'smooth' }), 80);
   }
@@ -176,13 +184,18 @@ function App() {
 
   return (
     <div className="site-shell">
+      {PAGES_MODE && <div className="pages-banner">Browser edition · Your answers stay in this tab. Email delivery and account access need the full service.</div>}
       <Header stage={stage} progress={progress} answered={answeredCount} total={visibleQuestions.length} />
+      <nav className="app-tabs" aria-label="Main navigation">{[['wellness', HeartPulse, 'Wellness'], ['insurance', ShieldCheck, 'Insurance'], ['shopping', ShoppingBasket, 'Shopping']].map(([id, Icon, label]) => <button key={id} type="button" aria-current={activeTab === id ? 'page' : undefined} className={activeTab === id ? 'active' : ''} onClick={() => setActiveTab(id)}><Icon size={21} />{label}</button>)}</nav>
+      {activeTab !== 'wellness' && <Marketplace tab={activeTab} profile={profile} setProfile={setProfile} answers={answers} onProfile={() => setActiveTab('wellness')} />}
+      <div hidden={activeTab !== 'wellness'}>
       {stage === 'welcome' && <Welcome profile={profile} setProfile={setProfile} waitlist={waitlist} setWaitlist={setWaitlist} consent={consent} setConsent={setConsent} notice={notice} onBegin={beginAssessment} memberAccess={memberAccess} setMemberAccess={setMemberAccess} onOpenProgress={openProgress} busy={busy} onViewProgress={() => setStage('progress')} history={history} />}
       {stage === 'assessment' && <Assessment grouped={grouped} answers={answers} onAnswer={answerQuestion} activeSection={activeSection} setActiveSection={setActiveSection} notice={notice} onSubmit={preparePriorities} busy={busy} />}
       {stage === 'priorities' && <PrioritySelection concerns={concerns} selected={selectedPriorities} setSelected={setSelectedPriorities} notice={notice} busy={busy} onBack={() => { setStage('assessment'); setActiveSection(sectionOrder.length - 1); setNotice(''); }} onSubmit={submitAssessment} />}
       {stage === 'progress' && <ProgressDashboard history={history} profile={profile} onRetake={startRetake} onClose={() => setStage(dashboard ? 'results' : 'welcome')} />}
       {stage === 'results' && dashboard && <Results dashboard={dashboard} onRestart={startRetake} onViewProgress={() => setStage('progress')} history={history} resultsRef={resultsRef} />}
-      {dashboard && <Chat dashboard={dashboard} open={chatOpen} setOpen={setChatOpen} />}
+      {dashboard && <HealthChat key={dashboard.user_id} dashboard={dashboard} answers={answers} open={chatOpen} setOpen={setChatOpen} />}
+      </div>
       <Footer />
     </div>
   );
@@ -200,7 +213,7 @@ function Welcome({ profile, setProfile, waitlist, setWaitlist, consent, setConse
       <div className="hero-visual" aria-hidden="true"><MiniRadar /><div><strong>Your whole-life view</strong><p>See strengths and opportunities together, not as isolated symptoms.</p></div></div>
     </section>
     <section className="steps-band" aria-label="How it works">{['Complete the check', 'Choose what matters most', 'Build your action plan'].map((step, index) => <div key={step}><b>0{index + 1}</b><span>{step}</span></div>)}</section>
-    <ReturningAccess memberAccess={memberAccess} setMemberAccess={setMemberAccess} onSubmit={onOpenProgress} busy={busy} notice={notice} onViewProgress={onViewProgress} history={history} />
+    {!PAGES_MODE && <ReturningAccess memberAccess={memberAccess} setMemberAccess={setMemberAccess} onSubmit={onOpenProgress} busy={busy} notice={notice} onViewProgress={onViewProgress} history={history} />}
     <section className="registration" id="registration">
       <div className="registration-intro"><p className="eyebrow">Let’s begin</p><h2>Tell us a little about you</h2><p>Your age and home situation help us interpret your answers with more context. Your postcode is used to find suitable services and older-adult activities nearby.</p><div className="privacy-note"><ShieldCheck /><span>We only ask for details that help personalise your report. This is a wellness guide, not a diagnosis.</span></div></div>
       <form className="registration-form" onSubmit={onBegin}>
@@ -211,7 +224,7 @@ function Welcome({ profile, setProfile, waitlist, setWaitlist, consent, setConse
         </div>
         <div className="form-divider"><span>Contact and location</span></div>
         <div className="form-grid">
-          <label>Email address<input type="email" value={waitlist.email} onChange={(event) => setWaitlist({ ...waitlist, email: event.target.value })} autoComplete="email" placeholder="jane@example.com" /></label>
+          <label>Email address {PAGES_MODE && <small>Optional · not sent or stored</small>}<input type="email" value={waitlist.email} onChange={(event) => setWaitlist({ ...waitlist, email: event.target.value })} autoComplete="email" placeholder="jane@example.com" /></label>
           <label>Phone number <small className="label-note">Optional</small><input type="tel" value={profile.phone} onChange={update('phone')} autoComplete="tel" placeholder="For example, 07123 456789" /></label>
           <label className="wide">Address <small className="label-note">Optional</small><input value={profile.address} onChange={update('address')} autoComplete="street-address" placeholder="House number and street" /></label>
           <label>UK postcode<input value={profile.postcode} onChange={update('postcode')} autoComplete="postal-code" placeholder="For example, SW6 1LY" /><small>Used to find relevant support near you.</small></label>
@@ -226,9 +239,10 @@ function Welcome({ profile, setProfile, waitlist, setWaitlist, consent, setConse
           <label>Employment status<select value={profile.employment_status} onChange={update('employment_status')}><option value="">Choose one</option><option>Retired</option><option>Employed - full time</option><option>Employed - part time</option><option>Self-employed</option><option>Volunteering</option><option>Not currently working</option></select></label>
           <label>Main career sector<select value={profile.employment_sector} onChange={update('employment_sector')}><option value="">Choose one</option><option>Healthcare</option><option>Education</option><option>Public sector</option><option>Retail</option><option>Manufacturing</option><option>Finance</option><option>Homemaker</option><option>Other</option><option>Not applicable</option></select></label>
         </div>
-        <label className="check-row"><input type="checkbox" checked={waitlist.join} onChange={(event) => setWaitlist({ ...waitlist, join: event.target.checked })} /><span><strong>Keep me informed.</strong> Add me to the early list for ACT’s AI-powered Healthy Longevity support.</span></label>
-        <label className="check-row"><input type="checkbox" checked={consent.report} onChange={(event) => setConsent({ ...consent, report: event.target.checked })} /><span>I agree that ACT may use my answers to create and email my personal wellness report.</span></label>
-        <label className="check-row optional"><input type="checkbox" checked={consent.analytics} onChange={(event) => setConsent({ ...consent, analytics: event.target.checked })} /><span>ACT may use my anonymised answers to understand population wellbeing. This is optional.</span></label>
+        {!PAGES_MODE && <label className="check-row"><input type="checkbox" checked={waitlist.join} onChange={(event) => setWaitlist({ ...waitlist, join: event.target.checked })} /><span><strong>Keep me informed.</strong> Add me to the early list for ACT’s AI-powered Healthy Longevity support.</span></label>}
+        <label className="check-row"><input type="checkbox" checked={consent.report} onChange={(event) => setConsent({ ...consent, report: event.target.checked })} /><span>{PAGES_MODE ? 'Use my answers in this browser to create my wellness plan. Nothing is emailed or saved to an account.' : 'I agree that ACT may use my answers to create and email my personal wellness report.'}</span></label>
+        {!PAGES_MODE && <div className="check-row legal-consent"><input id="legal-consent" type="checkbox" checked={consent.legal} onChange={(event) => setConsent({ ...consent, legal: event.target.checked })} /><label htmlFor="legal-consent">I have read and agree to the <a href={`${import.meta.env.BASE_URL}legal/terms-and-conditions.pdf`} target="_blank" rel="noreferrer">Terms and Conditions</a>, and I acknowledge the <a href={`${import.meta.env.BASE_URL}legal/privacy-policy.pdf`} target="_blank" rel="noreferrer">Privacy Policy</a> and <a href={`${import.meta.env.BASE_URL}legal/cookie-policy.pdf`} target="_blank" rel="noreferrer">Cookie Policy</a>.</label></div>}
+        {!PAGES_MODE && <label className="check-row optional"><input type="checkbox" checked={consent.analytics} onChange={(event) => setConsent({ ...consent, analytics: event.target.checked })} /><span>ACT may use my anonymised answers to understand population wellbeing. This is optional.</span></label>}
         {notice && <p className="notice" role="status">{notice}</p>}
         <button className="primary-button" type="submit">Start my wellness check <ArrowRight /></button><p className="time-note">About 8 minutes · Free</p>
       </form>
@@ -238,7 +252,7 @@ function Welcome({ profile, setProfile, waitlist, setWaitlist, consent, setConse
 
 function ReturningAccess({ memberAccess, setMemberAccess, onSubmit, busy, notice, onViewProgress, history }) {
   if (memberAccess.authenticated) return <section className="returning-access signed-in"><div><span className="returning-icon"><CheckCircle2 /></span><div><p className="eyebrow">Welcome back</p><h2>Your next check will join your progress timeline</h2><p>{history.length} previous assessment{history.length === 1 ? '' : 's'} available to compare.</p></div></div><button className="secondary-button" type="button" onClick={onViewProgress}><History /> View my progress</button></section>;
-  return <section className="returning-access"><div className="returning-copy"><span className="returning-icon"><History /></span><div><p className="eyebrow">Completed ACT before?</p><h2>See how your wellness has changed</h2><p>Use the email address and private access code from your ACT report email.</p></div></div><form onSubmit={onSubmit}><label>Email address<input type="email" value={memberAccess.email} onChange={(event) => setMemberAccess({ ...memberAccess, email: event.target.value })} autoComplete="email" placeholder="jane@example.com" /></label><label>ACT access code<input value={memberAccess.access_code} onChange={(event) => setMemberAccess({ ...memberAccess, access_code: event.target.value.toUpperCase() })} autoComplete="one-time-code" placeholder="ACT-ABCD-2345" /></label><button className="secondary-button" type="submit" disabled={busy}><LockKeyhole /> {busy ? 'Opening...' : 'Open my progress'}</button>{notice && <p className="returning-notice" role="status">{notice}</p>}</form></section>;
+  return <section className="returning-access"><div className="returning-copy"><span className="returning-icon"><History /></span><div><p className="eyebrow">Completed ACT before?</p><h2>See how your wellness has changed</h2><p>Use the email address and private access code from your ACT report email.</p></div></div><form onSubmit={onSubmit}><label>Email address {PAGES_MODE && <small>Optional · not sent or stored</small>}<input type="email" value={memberAccess.email} onChange={(event) => setMemberAccess({ ...memberAccess, email: event.target.value })} autoComplete="email" placeholder="jane@example.com" /></label><label>ACT access code<input value={memberAccess.access_code} onChange={(event) => setMemberAccess({ ...memberAccess, access_code: event.target.value.toUpperCase() })} autoComplete="one-time-code" placeholder="ACT-ABCD-2345" /></label><button className="secondary-button" type="submit" disabled={busy}><LockKeyhole /> {busy ? 'Opening...' : 'Open my progress'}</button>{notice && <p className="returning-notice" role="status">{notice}</p>}</form></section>;
 }
 
 function Assessment({ grouped, answers, onAnswer, activeSection, setActiveSection, notice, onSubmit, busy }) {
@@ -287,7 +301,7 @@ function Results({ dashboard, onRestart, onViewProgress, history, resultsRef }) 
     <ContentHeading eyebrow="Do it at home" title="Gentle movement videos" copy="Choose a level that feels safe today." />
     <section className="media-grid">{movementVideos.map((item) => <VideoCard item={item} key={item.title} />)}</section>
     {foodVideos.length > 0 && <><ContentHeading eyebrow="Nourish your day" title="Simple recipe ideas" copy="Healthy, low-effort meals chosen for your results." /><section className="media-grid">{foodVideos.map((item) => <VideoCard item={item} key={item.title} />)}</section></>}
-    <section className="report-ready"><div><span className="report-icon"><FileText /></span><div><p className="eyebrow">Take your plan with you</p><h2>Your PDF report is ready</h2><p>{dashboard.delivery?.email?.sent ? `We emailed a copy to ${dashboard.delivery.email.to}.` : 'Your PDF has been prepared. Add valid email settings to send it automatically.'}</p></div></div><div className="report-sheet" aria-hidden="true"><b>ACT</b><span>My wellness<br />report</span></div></section>
+    <section className="report-ready"><div><span className="report-icon"><FileText /></span><div><p className="eyebrow">Take your plan with you</p><h2>{PAGES_MODE ? 'Keep a copy of your plan' : 'Your PDF report is ready'}</h2><p>{PAGES_MODE ? 'Use your browser’s Print option to save this plan as a PDF. Progress lasts only for this visit.' : dashboard.delivery?.email?.sent ? `We emailed a copy to ${dashboard.delivery.email.to}.` : 'Your PDF has been prepared. Add valid email settings to send it automatically.'}</p></div></div><div className="report-sheet" aria-hidden="true"><b>ACT</b><span>My wellness<br />report</span></div></section>
   </main>;
 }
 
@@ -366,37 +380,9 @@ function ResourceCard({ item, postcode }) {
 function VideoCard({ item }) { return <a className="video-card" href={item.url} target="_blank" rel="noreferrer"><div className="video-image"><img src={item.thumbnail} alt="" /><span><Play /></span></div><div><small>{item.category === 'Food' ? 'Easy recipe' : 'Gentle movement'}</small><h3>{item.title}</h3><p>{item.why}</p><b>Watch on YouTube <ArrowRight /></b></div></a>; }
 function DeliveryStatus({ delivery }) { if (!delivery) return null; const sent = delivery.email?.sent; return <div className={sent ? 'delivery-status sent' : 'delivery-status pending'}><FileText /><div><strong>{sent ? 'Report emailed' : 'PDF prepared'}</strong><span>{sent ? `A copy has been sent to ${delivery.email.to}.` : delivery.email?.reason || 'Email delivery is not configured yet.'}</span></div></div>; }
 
-function Chat({ dashboard, open, setOpen }) {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([{ role: 'bot', text: `Hello ${dashboard.profile.name}. I can help explain your scores or turn a suggestion into a simple first step.` }]);
-  const [busy, setBusy] = useState(false);
-  const [consent, setConsent] = useState(false);
-  const [available, setAvailable] = useState(null);
-  const logRef = useRef(null);
-  useEffect(() => { if (open) fetch(`${API}/api/chat/status`).then((response) => response.json()).then((data) => setAvailable(data.available)).catch(() => setAvailable(false)); }, [open]);
-  useEffect(() => { logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: 'smooth' }); }, [messages, busy, open]);
-  async function send(event, prompt) {
-    event?.preventDefault();
-    const text = (prompt || message).trim();
-    if (!text || busy || !consent || !available) return;
-    setMessages((current) => [...current, { role: 'user', text }]);
-    setMessage(''); setBusy(true);
-    try {
-      const response = await fetch(`${API}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: dashboard.user_id, chat_token: dashboard.chat_token, message: text, ai_consent: true }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Ask ACT could not answer right now.');
-      setMessages((current) => [...current, { role: 'bot', text: data.answer }]);
-    } catch (error) {
-      setMessages((current) => [...current, { role: 'bot', text: error.message || 'I cannot reach the local service right now. Please try again in a moment.' }]);
-    } finally { setBusy(false); }
-  }
-  const canAsk = consent && available && !busy;
-  return <><button className="chat-button" type="button" onClick={() => setOpen(!open)} aria-expanded={open}><Sparkles /> Ask ACT AI</button>{open && <aside className="chat-panel" aria-label="Ask ACT AI"><header><div><span><Sparkles /></span><div><strong>Ask ACT AI</strong><small>About your wellness plan</small></div></div><button type="button" onClick={() => setOpen(false)} aria-label="Close chat"><X /></button></header><div className="chat-log" ref={logRef} role="log" aria-live="polite">{messages.map((item, index) => <p className={item.role} key={`${item.role}-${index}`}>{item.text}</p>)}{busy && <p className="bot">Thinking about your question...</p>}</div>{available === false && <p className="chat-status" role="status">AI is not connected yet. The app owner needs to add an OpenAI API key.</p>}<label className="chat-consent"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I agree to send my assessment answers and questions to OpenAI for a reply. ACT will save this conversation.</span></label><div className="quick-prompts">{['Why was this recommended?', 'Explain my Clinical Risk score', 'Help me take the first step'].map((prompt) => <button type="button" onClick={() => send(null, prompt)} disabled={!canAsk} key={prompt}>{prompt}</button>)}</div><form onSubmit={send}><input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={600} placeholder="Ask about your plan" aria-label="Your question" disabled={!canAsk} /><button type="submit" aria-label="Send" disabled={!canAsk || !message.trim()}><Send /></button></form><p className="chat-disclaimer">Not for emergencies or diagnosis. In the UK, call 999 for an emergency or NHS 111 for urgent help.</p></aside>}</>;
-}
-
 function ResourceIcon({ type, icon }) { const key = icon || type; const Icon = { clinical: HeartPulse, movement: Activity, walking: Activity, sleep: Moon, nutrition: Salad, local: MapPin, social: Users, users: Users, learning: BookOpen, book: BookOpen, prevention: ShieldCheck, maintenance: HeartPulse, service: ShoppingBasket, shopping: ShoppingBasket, meal: Utensils, meal_delivery: Utensils, care: Home, home: Home, health_guidance: HeartPulse, heart: HeartPulse, finance: ShieldCheck }[key] || Sparkles; return <span className="card-icon"><Icon /></span>; }
 function Radar({ scores }) { const size = 500, center = 250, radius = 142, labelRadius = 205; const polygon = (scale) => scoreMeta.map((_, index) => { const angle = -Math.PI / 2 + (Math.PI * 2 * index) / scoreMeta.length; return `${center + Math.cos(angle) * radius * scale},${center + Math.sin(angle) * radius * scale}`; }).join(' '); const valuePoints = scoreMeta.map(([key], index) => { const angle = -Math.PI / 2 + (Math.PI * 2 * index) / scoreMeta.length; const value = scores[key] / 100; return `${center + Math.cos(angle) * radius * value},${center + Math.sin(angle) * radius * value}`; }).join(' '); return <svg className="radar" viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Five dimension Healthy Longevity profile">{[.25, .5, .75, 1].map((scale) => <polygon className="radar-grid" points={polygon(scale)} key={scale} />)}{scoreMeta.map((_, index) => { const angle = -Math.PI / 2 + (Math.PI * 2 * index) / scoreMeta.length; return <line className="radar-axis" key={index} x1={center} y1={center} x2={center + Math.cos(angle) * radius} y2={center + Math.sin(angle) * radius} />; })}<polygon className="radar-shape" points={valuePoints} />{scoreMeta.map(([key, label], index) => { const angle = -Math.PI / 2 + (Math.PI * 2 * index) / scoreMeta.length; const x = center + Math.cos(angle) * labelRadius; const y = center + Math.sin(angle) * labelRadius; const words = label.split(' '); return <text className="radar-label" textAnchor="middle" key={key} x={x} y={y}>{words.map((word, wordIndex) => <tspan x={x} dy={wordIndex ? 17 : 0} key={word}>{word}</tspan>)}</text>; })}</svg>; }
 function MiniRadar() { return <svg viewBox="0 0 240 210"><polygon points="120,18 218,88 182,194 58,194 22,88" className="mini-grid" /><polygon points="120,50 186,96 162,166 72,174 50,96" className="mini-shape" /><circle cx="120" cy="50" r="5" /><circle cx="186" cy="96" r="5" /><circle cx="162" cy="166" r="5" /><circle cx="72" cy="174" r="5" /><circle cx="50" cy="96" r="5" /></svg>; }
-function Footer() { return <footer><div><span className="brand-mark">ACT</span><strong>Ageing Care Technology</strong></div><p>This wellness check supports structured assessment. It does not diagnose conditions or replace clinical judgement.</p></footer>; }
+function Footer() { return <footer><div><span className="brand-mark">ACT</span><strong>Ageing Care Technology</strong></div><p>This wellness check supports structured assessment. It does not diagnose conditions or replace clinical judgement.</p><nav aria-label="Legal policies"><a href={`${import.meta.env.BASE_URL}legal/terms-and-conditions.pdf`} target="_blank" rel="noreferrer">Terms</a><a href={`${import.meta.env.BASE_URL}legal/privacy-policy.pdf`} target="_blank" rel="noreferrer">Privacy</a><a href={`${import.meta.env.BASE_URL}legal/cookie-policy.pdf`} target="_blank" rel="noreferrer">Cookies</a></nav></footer>; }
 
 createRoot(document.getElementById('root')).render(<App />);

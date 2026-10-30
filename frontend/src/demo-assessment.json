@@ -1,0 +1,253 @@
+{
+  "dashboard": {
+    "user_id": "demo-alex",
+    "profile": {
+      "name": "Alex (sample profile)",
+      "dob": "1958-06-15",
+      "postcode": "SW6",
+      "living_arrangement": "Alone",
+      "country": "United Kingdom"
+    },
+    "scores": {
+      "staying_healthy": 78,
+      "independence": 100,
+      "wellbeing": 78,
+      "social_resources": 89,
+      "clinical_risk": 81,
+      "accommodation": 100,
+      "financial_wellbeing": 100,
+      "nutrition_vitality": 78,
+      "sleep_recovery": 35,
+      "social_connection": 68,
+      "cognition_sensory": 100,
+      "preventive_care": 77,
+      "gds_15": 0
+    },
+    "persona": "The assessment has flagged risk related to falls as important clinical points to discuss with a GP or suitable health professional. These come before the general wellness suggestions. Alex (sample profile) chose diet and nutrition, exercise and movement, sleep as the main priorities. Alex (sample profile)'s strongest areas are independence and social resources, while the clearest opportunities are staying healthy, wellbeing and clinical risk. Taking account of age 68 and living alone, a practical whole-person plan is to choose one welcoming older-adult group, workshop or wellbeing walk near SW6 for regular connection; then arrange a blood-pressure check and use the NHS or WHO information below to prepare any questions; then build movement gently through seated exercise or a supervised strength-and-balance class; then protect energy with regular, simple meals that include protein and vegetables. This is a wellness summary rather than a diagnosis; seek prompt professional advice for new, worsening or worrying symptoms.",
+    "recommendations": [
+      {
+        "title": "Risk related to falls",
+        "body": "Even one recent fall is worth reviewing to reduce the chance of injury or another fall. Discuss this with a GP or local falls service. Call 999 after a fall if there may be a head, back, neck or hip injury, or if the person cannot get up.",
+        "significant": true,
+        "concern_id": "falls",
+        "type": "clinical"
+      },
+      {
+        "title": "Make nourishing meals easier",
+        "body": "Try regular simple meals with a protein food, vegetables and enough fluids; use delivery or prepared meals when helpful.",
+        "type": "nutrition",
+        "concern_id": "nutrition"
+      },
+      {
+        "title": "WHO prevention opportunity: movement",
+        "body": "Gentle activity, balance practice and strength work can support independence and reduce preventable decline.",
+        "type": "movement",
+        "concern_id": "movement"
+      },
+      {
+        "title": "Sleep routine",
+        "body": "A consistent wake time, morning daylight and calmer evenings can support recovery and daytime energy.",
+        "type": "sleep",
+        "concern_id": "sleep"
+      },
+      {
+        "title": "Falls prevention support",
+        "body": "A recent fall is worth discussing with a GP or falls service, especially after repeated falls or difficulty getting up from the floor.",
+        "type": "movement",
+        "concern_id": "falls"
+      },
+      {
+        "title": "Find your local community",
+        "body": "Older-adult coffee mornings, u3a workshops, friendship groups and wellbeing walks around SW6 can turn social contact into a regular part of the week.",
+        "type": "social",
+        "concern_id": "loneliness"
+      }
+    ],
+    "videos": [
+      {
+        "title": "Seated senior exercise",
+        "category": "Movement",
+        "url": "https://www.youtube.com/results?search_query=senior+seated+exercise+follow+along",
+        "thumbnail": "https://img.youtube.com/vi/8BcPHWGQO44/hqdefault.jpg",
+        "why": "A chair-based routine can feel safer when balance or confidence is lower."
+      },
+      {
+        "title": "Balance exercises for seniors",
+        "category": "Movement",
+        "url": "https://www.youtube.com/results?search_query=safe+balance+exercises+for+seniors",
+        "thumbnail": "https://img.youtube.com/vi/z-tUHuNPStw/hqdefault.jpg",
+        "why": "Balance practice helps reduce fall risk and supports everyday movement."
+      },
+      {
+        "title": "Gentle yoga for seniors",
+        "category": "Movement",
+        "url": "https://www.youtube.com/results?search_query=gentle+yoga+for+seniors+follow+along",
+        "thumbnail": "https://img.youtube.com/vi/kFhG-ZzLNN4/hqdefault.jpg",
+        "why": "Gentle yoga can support flexibility, breathing and calm."
+      },
+      {
+        "title": "Tuna egg salad, 27g protein",
+        "category": "Food",
+        "url": "https://www.youtube.com/watch?v=e2VUemyscvQ",
+        "thumbnail": "https://img.youtube.com/vi/e2VUemyscvQ/hqdefault.jpg",
+        "why": "Simple protein-rich meals can help preserve muscle and steady energy."
+      },
+      {
+        "title": "Mediterranean chickpea salad",
+        "category": "Food",
+        "url": "https://www.youtube.com/watch?v=jWCrEAvSZ8g",
+        "thumbnail": "https://img.youtube.com/vi/jWCrEAvSZ8g/hqdefault.jpg",
+        "why": "Low-salt, fibre-rich dinners can support blood pressure and cholesterol goals."
+      },
+      {
+        "title": "Peanut butter overnight oats",
+        "category": "Food",
+        "url": "https://www.youtube.com/watch?v=XemsXWiJ-eM",
+        "thumbnail": "https://img.youtube.com/vi/XemsXWiJ-eM/hqdefault.jpg",
+        "why": "Make-ahead oats are low effort and can support regular meals on tired mornings."
+      }
+    ],
+    "lowest_categories": [
+      "staying_healthy",
+      "wellbeing",
+      "clinical_risk"
+    ],
+    "support_priorities": [
+      {
+        "title": "Falls prevention support",
+        "body": "A recent fall is worth discussing with a GP or falls service, especially after repeated falls or difficulty getting up from the floor.",
+        "type": "movement",
+        "concern_id": "falls"
+      },
+      {
+        "title": "Find your local community",
+        "body": "Older-adult coffee mornings, u3a workshops, friendship groups and wellbeing walks around SW6 can turn social contact into a regular part of the week.",
+        "type": "social",
+        "concern_id": "loneliness"
+      }
+    ],
+    "prevention_opportunities": [
+      {
+        "title": "WHO prevention opportunity: movement",
+        "body": "Gentle activity, balance practice and strength work can support independence and reduce preventable decline.",
+        "type": "movement",
+        "concern_id": "movement"
+      },
+      {
+        "title": "Blood pressure check",
+        "body": "Arrange a blood-pressure check with a pharmacy or GP. The NHS and WHO links below explain why checks matter and what to discuss with a clinician.",
+        "type": "prevention",
+        "concern_id": "blood_pressure"
+      },
+      {
+        "title": "Sleep routine",
+        "body": "A consistent wake time, morning daylight and calmer evenings can support recovery and daytime energy.",
+        "type": "sleep",
+        "concern_id": "sleep"
+      }
+    ],
+    "clinical_risks": [
+      {
+        "title": "Risk related to falls",
+        "body": "Even one recent fall is worth reviewing to reduce the chance of injury or another fall. Discuss this with a GP or local falls service. Call 999 after a fall if there may be a head, back, neck or hip injury, or if the person cannot get up.",
+        "significant": true,
+        "concern_id": "falls"
+      },
+      {
+        "title": "Unknown blood pressure",
+        "body": "Without a recent blood-pressure check, an important cardiovascular risk may be missed. Arrange a check with a pharmacy or GP.",
+        "significant": false
+      }
+    ],
+    "identified_concerns": [
+      {
+        "id": "falls",
+        "title": "Falls",
+        "detail": "Reducing the chance and consequences of another fall",
+        "clinical": true
+      },
+      {
+        "id": "nutrition",
+        "title": "Diet and nutrition",
+        "detail": "Making regular, nourishing meals easier",
+        "clinical": false
+      },
+      {
+        "id": "movement",
+        "title": "Exercise and movement",
+        "detail": "Building safe, regular movement",
+        "clinical": false
+      },
+      {
+        "id": "blood_pressure",
+        "title": "Blood pressure",
+        "detail": "Arranging a recent blood-pressure check",
+        "clinical": false
+      },
+      {
+        "id": "loneliness",
+        "title": "Loneliness and connection",
+        "detail": "Finding comfortable ways to connect with other people",
+        "clinical": false
+      },
+      {
+        "id": "sleep",
+        "title": "Sleep",
+        "detail": "Improving rest and daytime energy",
+        "clinical": false
+      }
+    ],
+    "selected_priorities": [
+      {
+        "id": "nutrition",
+        "title": "Diet and nutrition",
+        "detail": "Making regular, nourishing meals easier",
+        "clinical": false
+      },
+      {
+        "id": "movement",
+        "title": "Exercise and movement",
+        "detail": "Building safe, regular movement",
+        "clinical": false
+      },
+      {
+        "id": "sleep",
+        "title": "Sleep",
+        "detail": "Improving rest and daytime energy",
+        "clinical": false
+      }
+    ]
+  },
+  "answers": {
+    "vision_problem": "No",
+    "hearing_problem": "No",
+    "teeth_problem": "No",
+    "foot_problem": "No",
+    "falls_3_months": "Yes",
+    "diet_concern": "Yes",
+    "lost_3kg": "No",
+    "regular_exercise": "No",
+    "vaccinations": "Yes",
+    "bp_checked": "No",
+    "shopping": "Yes",
+    "dressing": "Yes",
+    "bathing": "Yes",
+    "incontinence": "No",
+    "toileting": "Yes",
+    "transfers": "Yes",
+    "indoors": "Yes",
+    "accommodation_problem": "No",
+    "finance_problem": "No",
+    "participation_ok": "Yes",
+    "lonely": "Yes",
+    "sleep_trouble": "Yes",
+    "moderate_pain": "No",
+    "down_depressed": "No",
+    "little_interest": "No",
+    "forgetting": "No",
+    "confused_day_place": "No",
+    "memory_concern_other": "No",
+    "falls_frequency": "No",
+    "falls_get_up": "No"
+  }
+}

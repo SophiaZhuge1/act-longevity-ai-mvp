@@ -8,12 +8,13 @@ from datetime import date
 QUESTIONS = [
     {"id": "vision_problem", "section": "Staying Healthy", "text": "Do you have a problem with your vision?", "type": "yesno", "concern": "Vision"},
     {"id": "hearing_problem", "section": "Staying Healthy", "text": "Do you have a problem with your hearing?", "type": "yesno", "concern": "Hearing"},
-    {"id": "teeth_problem", "section": "Staying Healthy", "text": "Do you have a problem with your teeth, mouth or dentures?", "type": "yesno", "concern": "Teeth and mouth"},
-    {"id": "falls_3_months", "section": "Staying Healthy", "text": "Have you had any falls in the last three months?", "type": "yesno", "concern": "Falls", "trigger": True},
-    {"id": "falls_frequency", "section": "Staying Healthy", "text": "How many times have you fallen in the last three months?", "type": "choice", "options": ["Once", "Twice", "Three or more times"], "show_if": [{"id": "falls_3_months", "value": "Yes"}], "follow_up": "Falls"},
-    {"id": "falls_get_up", "section": "Staying Healthy", "text": "After a fall, would you have difficulty getting up from the floor without help?", "type": "yesno", "show_if": [{"id": "falls_3_months", "value": "Yes"}], "follow_up": "Falls"},
+    {"id": "teeth_problem", "section": "Staying Healthy", "text": "Do you have a problem with your teeth?", "type": "yesno", "concern": "Teeth and mouth"},
+    {"id": "foot_problem", "section": "Staying Healthy", "text": "Do you have a problem with your feet?", "type": "yesno", "concern": "Foot problems"},
+    {"id": "falls_3_months", "section": "Staying Healthy", "text": "Have you had any falls in the last 3 months?", "type": "yesno", "concern": "Falls", "trigger": True},
+    {"id": "falls_frequency", "section": "Staying Healthy", "text": "Have you had 2 or more falls in the last 3 months?", "type": "yesno", "show_if": [{"id": "falls_3_months", "value": "Yes"}], "follow_up": "Falls"},
+    {"id": "falls_get_up", "section": "Staying Healthy", "text": "Have you had any difficulty getting up off the floor after a fall?", "type": "yesno", "show_if": [{"id": "falls_3_months", "value": "Yes"}], "follow_up": "Falls"},
     {"id": "diet_concern", "section": "Staying Healthy", "text": "Do you have any concerns about your diet or nutrition?", "type": "yesno", "concern": "Diet and nutrition"},
-    {"id": "lost_3kg", "section": "Staying Healthy", "text": "Have you unintentionally lost 3 kg in weight over the last three months?", "type": "yesno", "concern": "Unintentional weight loss"},
+    {"id": "lost_3kg", "section": "Staying Healthy", "text": "Have you unintentionally lost 3kg in weight over the last three months?", "type": "yesno", "concern": "Unintentional weight loss"},
     {"id": "regular_exercise", "section": "Staying Healthy", "text": "Do you take regular exercise?", "type": "positive_yesno", "concern": "Exercise and movement"},
     {"id": "vaccinations", "section": "Staying Healthy", "text": "Are you up to date with your vaccinations?", "type": "positive_yesno", "concern": "Vaccinations"},
     {"id": "bp_checked", "section": "Staying Healthy", "text": "Has your blood pressure been checked in the last year?", "type": "positive_yesno", "concern": "Blood pressure"},
@@ -21,27 +22,28 @@ QUESTIONS = [
     {"id": "shopping", "section": "Independence", "text": "Are you able to do your shopping?", "type": "positive_yesno", "concern": "Shopping"},
     {"id": "dressing", "section": "Independence", "text": "Can you dress yourself?", "type": "positive_yesno", "concern": "Dressing"},
     {"id": "bathing", "section": "Independence", "text": "Are you able to use a bath or shower by yourself?", "type": "positive_yesno", "concern": "Bathing or showering"},
-    {"id": "toileting", "section": "Independence", "text": "Can you use the toilet or commode?", "type": "positive_yesno", "concern": "Using the toilet"},
+    {"id": "incontinence", "section": "Independence", "text": "Do you have problems with your bladder, such as accidental leakage of urine, most days?", "type": "yesno", "concern": "Bladder control"},
+    {"id": "toileting", "section": "Independence", "text": "Can you use the toilet (or commode)?", "type": "positive_yesno", "concern": "Using the toilet"},
     {"id": "transfers", "section": "Independence", "text": "Can you move yourself from bed to chair, if they are next to each other?", "type": "positive_yesno", "concern": "Moving between bed and chair"},
     {"id": "indoors", "section": "Independence", "text": "Can you get around indoors?", "type": "positive_yesno", "concern": "Getting around indoors"},
 
     {"id": "accommodation_problem", "section": "Wellbeing", "text": "Do you have problems with the place where you live?", "type": "yesno", "concern": "Your home", "trigger": True},
-    {"id": "accommodation_safe", "section": "Wellbeing", "text": "Do you feel unsafe where you live?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
-    {"id": "accommodation_suitable", "section": "Wellbeing", "text": "Does your home make everyday activities difficult?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
-    {"id": "accommodation_access", "section": "Wellbeing", "text": "Is it difficult to move around or get in and out of your home?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
-    {"id": "accommodation_warmth", "section": "Wellbeing", "text": "Is it difficult to keep your home comfortably warm?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
-    {"id": "accommodation_maintenance", "section": "Wellbeing", "text": "Are repairs or home maintenance becoming difficult to manage?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
-    {"id": "accommodation_stability", "section": "Wellbeing", "text": "Are you worried about being able to remain in your current home?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
+    {"id": "accommodation_safe", "section": "Wellbeing", "text": "Do you have concerns because of your safety and security where you live?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
+    {"id": "accommodation_suitable", "section": "Wellbeing", "text": "Do you have concerns because of the condition of your home?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
+    {"id": "accommodation_access", "section": "Wellbeing", "text": "Do you have concerns because of the location of your home?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
+    {"id": "accommodation_warmth", "section": "Wellbeing", "text": "Do you have concerns because of the costs of your housing?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
+    {"id": "accommodation_maintenance", "section": "Wellbeing", "text": "Do you have concerns because of the repair and maintenance of your home?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
+    {"id": "accommodation_stability", "section": "Wellbeing", "text": "Do you have concerns because of managing to live independently where you are?", "type": "yesno", "show_if": [{"id": "accommodation_problem", "value": "Yes"}], "follow_up": "Your home"},
     {"id": "finance_problem", "section": "Wellbeing", "text": "Do you have problems with your finances?", "type": "yesno", "concern": "Finances", "trigger": True},
-    {"id": "finance_essentials", "section": "Wellbeing", "text": "Do you have difficulty meeting essential costs such as food, heating or bills?", "type": "yesno", "show_if": [{"id": "finance_problem", "value": "Yes"}], "follow_up": "Finances"},
-    {"id": "finance_unexpected", "section": "Wellbeing", "text": "Would an unexpected expense be difficult for you to manage?", "type": "yesno", "show_if": [{"id": "finance_problem", "value": "Yes"}], "follow_up": "Finances"},
+    {"id": "finance_essentials", "section": "Wellbeing", "text": "In general, do your finances work out at the end of the month?", "type": "positive_yesno", "show_if": [{"id": "finance_problem", "value": "Yes"}], "follow_up": "Finances"},
+    {"id": "finance_unexpected", "section": "Wellbeing", "text": "Are you able to manage your money and financial affairs?", "type": "positive_yesno", "show_if": [{"id": "finance_problem", "value": "Yes"}], "follow_up": "Finances"},
     {"id": "participation_ok", "section": "Wellbeing", "text": "Are you able to pursue leisure interests, hobbies, work and learning activities which are important to you?", "type": "positive_yesno", "concern": "Activities and interests"},
     {"id": "lonely", "section": "Wellbeing", "text": "Do you often feel lonely?", "type": "yesno", "concern": "Loneliness"},
     {"id": "sleep_trouble", "section": "Wellbeing", "text": "Have you had any trouble sleeping in the last month?", "type": "yesno", "concern": "Sleep"},
-    {"id": "moderate_pain", "section": "Wellbeing", "text": "Do you suffer from moderate or severe pain most days?", "type": "yesno", "concern": "Pain"},
+    {"id": "moderate_pain", "section": "Wellbeing", "text": "Do you suffer from moderate or severe pain, most days?", "type": "yesno", "concern": "Pain"},
     {"id": "down_depressed", "section": "Wellbeing", "text": "During the last month, have you often been bothered by feeling down, depressed or hopeless?", "type": "yesno", "concern": "Low mood", "trigger": True},
     {"id": "little_interest", "section": "Wellbeing", "text": "During the last month, have you often been bothered by having little interest or pleasure in doing things?", "type": "yesno", "concern": "Loss of interest", "trigger": True},
-    {"id": "gds_satisfied", "section": "Wellbeing", "text": "Thinking about the past week, are you basically satisfied with your life?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
+    {"id": "gds_satisfied", "section": "Wellbeing", "text": "Are you basically satisfied with your life?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_dropped_activities", "section": "Wellbeing", "text": "Have you dropped many of your activities and interests?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_empty", "section": "Wellbeing", "text": "Do you feel that your life is empty?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_bored", "section": "Wellbeing", "text": "Do you often get bored?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
@@ -50,7 +52,7 @@ QUESTIONS = [
     {"id": "gds_happy", "section": "Wellbeing", "text": "Do you feel happy most of the time?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_helpless", "section": "Wellbeing", "text": "Do you often feel helpless?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_stay_home", "section": "Wellbeing", "text": "Do you prefer to stay at home, rather than going out and doing new things?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
-    {"id": "gds_memory", "section": "Wellbeing", "text": "Do you feel you have more problems with memory than most people?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
+    {"id": "gds_memory", "section": "Wellbeing", "text": "Do you feel you have more problems with memory than most?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_wonderful_alive", "section": "Wellbeing", "text": "Do you think it is wonderful to be alive now?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_worthless", "section": "Wellbeing", "text": "Do you feel pretty worthless the way you are now?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
     {"id": "gds_energy", "section": "Wellbeing", "text": "Do you feel full of energy?", "type": "yesno", "show_if": [{"id": "down_depressed", "value": "Yes"}, {"id": "little_interest", "value": "Yes"}], "show_if_mode": "any", "follow_up": "Mood"},
@@ -111,8 +113,12 @@ def gds_score(answers: dict) -> int:
 
 def score_answers(answers: dict) -> dict:
     answers = sanitise_answers(answers)
-    independence_ids = ["shopping", "dressing", "bathing", "toileting", "transfers", "indoors"]
-    independence = round(sum(yes_good(answers.get(k, ""), True) for k in independence_ids) / len(independence_ids))
+    independence_values = [
+        yes_good(answers.get(key, ""), True)
+        for key in ["shopping", "dressing", "bathing", "toileting", "transfers", "indoors"]
+    ]
+    independence_values.append(yes_good(answers.get("incontinence", ""), False))
+    independence = round(sum(independence_values) / len(independence_values))
     nutrition = round(sum([
         yes_good(answers.get("diet_concern", ""), False),
         yes_good(answers.get("lost_3kg", ""), False),
@@ -143,11 +149,12 @@ def score_answers(answers: dict) -> dict:
         yes_good(answers.get("vision_problem", ""), False),
         yes_good(answers.get("hearing_problem", ""), False),
         yes_good(answers.get("teeth_problem", ""), False),
+        yes_good(answers.get("foot_problem", ""), False),
         yes_good(answers.get("falls_3_months", ""), False),
         yes_good(answers.get("regular_exercise", ""), True),
         nutrition,
         preventive,
-    ]) / 7)
+    ]) / 8)
     sleep = yes_good(answers.get("sleep_trouble", ""), False)
     pain = yes_good(answers.get("moderate_pain", ""), False)
     wellbeing = round(sum([
@@ -160,11 +167,11 @@ def score_answers(answers: dict) -> dict:
         "accommodation_warmth", "accommodation_maintenance", "accommodation_stability",
     ]
     accommodation = 100 if answers.get("accommodation_problem") == "No" else round(sum(yes_good(answers.get(k, ""), False) for k in accommodation_ids) / len(accommodation_ids))
-    financial = 100 if answers.get("finance_problem") == "No" else round(sum(yes_good(answers.get(k, ""), False) for k in ["finance_essentials", "finance_unexpected"]) / 2)
+    financial = 100 if answers.get("finance_problem") == "No" else round(sum(yes_good(answers.get(k, ""), True) for k in ["finance_essentials", "finance_unexpected"]) / 2)
     social_resources = round((social + accommodation + financial) / 3)
     falls_safety = 100
     if answers.get("falls_3_months") == "Yes":
-        falls_safety = 15 if answers.get("falls_frequency") in {"Twice", "Three or more times"} or answers.get("falls_get_up") == "Yes" else 35
+        falls_safety = 15 if answers.get("falls_frequency") in {"Yes", "Twice", "Three or more times"} or answers.get("falls_get_up") == "Yes" else 35
     weight_safety = 20 if answers.get("lost_3kg") == "Yes" else 100
     mood_significant = gds_score(answers) > 5 or (answers.get("down_depressed") == "Yes" and answers.get("little_interest") == "Yes")
     mood_safety = min(mental, 35) if mood_significant else 65 if answers.get("down_depressed") == "Yes" or answers.get("little_interest") == "Yes" else 100
@@ -355,13 +362,14 @@ def identified_concerns(answers: dict, scores: dict | None = None) -> list[dict]
         ("vision", "Vision", "Seeing clearly or managing vision in everyday life", answers.get("vision_problem") == "Yes"),
         ("hearing", "Hearing", "Hearing conversations and sounds clearly", answers.get("hearing_problem") == "Yes"),
         ("teeth", "Teeth and mouth", "Comfort with teeth, mouth or dentures", answers.get("teeth_problem") == "Yes"),
+        ("feet", "Foot problems", "Looking after foot health, movement and balance", answers.get("foot_problem") == "Yes"),
         ("falls", "Falls", "Reducing the chance and consequences of another fall", answers.get("falls_3_months") == "Yes"),
         ("nutrition", "Diet and nutrition", "Making regular, nourishing meals easier", answers.get("diet_concern") == "Yes"),
         ("weight_loss", "Unintentional weight loss", "Reviewing recent weight loss and protecting nutrition", answers.get("lost_3kg") == "Yes"),
         ("movement", "Exercise and movement", "Building safe, regular movement", answers.get("regular_exercise") == "No"),
         ("vaccinations", "Vaccinations", "Checking which vaccinations are recommended", answers.get("vaccinations") in {"No", "Not sure"}),
         ("blood_pressure", "Blood pressure", "Arranging a recent blood-pressure check", answers.get("bp_checked") in {"No", "Not sure"}),
-        ("independence", "Everyday independence", "Making shopping and personal routines easier", any(answers.get(key) == "No" for key in ["shopping", "dressing", "bathing", "toileting", "transfers", "indoors"])),
+        ("independence", "Everyday independence", "Making shopping and personal routines easier", any(answers.get(key) == "No" for key in ["shopping", "dressing", "bathing", "toileting", "transfers", "indoors"]) or answers.get("incontinence") == "Yes"),
         ("home", "Your home", "Improving safety, comfort or suitability at home", answers.get("accommodation_problem") == "Yes"),
         ("finances", "Finances", "Getting help with essential costs or money worries", answers.get("finance_problem") == "Yes"),
         ("activities", "Activities and interests", "Doing more of the activities that matter to you", answers.get("participation_ok") == "No"),
@@ -449,7 +457,7 @@ def prevention_opportunities_for(answers: dict, scores: dict) -> list[dict]:
 def clinical_risks_for(answers: dict, scores: dict) -> list[dict]:
     risks = []
     if answers.get("falls_3_months") == "Yes":
-        detail = "Repeated falls or difficulty getting up from the floor increase the importance of a prompt review." if answers.get("falls_frequency") in {"Twice", "Three or more times"} or answers.get("falls_get_up") == "Yes" else "Even one recent fall is worth reviewing to reduce the chance of injury or another fall."
+        detail = "Repeated falls or difficulty getting up from the floor increase the importance of a prompt review." if answers.get("falls_frequency") in {"Yes", "Twice", "Three or more times"} or answers.get("falls_get_up") == "Yes" else "Even one recent fall is worth reviewing to reduce the chance of injury or another fall."
         risks.append({"title": "Risk related to falls", "body": f"{detail} Discuss this with a GP or local falls service. Call 999 after a fall if there may be a head, back, neck or hip injury, or if the person cannot get up.", "significant": True, "concern_id": "falls"})
     if answers.get("lost_3kg") == "Yes":
         risks.append({"title": "Unintentional weight loss", "body": "Losing around 3 kg without trying in three months should be discussed promptly with a GP or suitable clinician, particularly if appetite, swallowing or energy has changed.", "significant": True, "concern_id": "weight_loss"})

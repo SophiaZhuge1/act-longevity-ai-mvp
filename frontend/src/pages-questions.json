@@ -1,0 +1,815 @@
+[
+  {
+    "id": "vision_problem",
+    "section": "Staying Healthy",
+    "text": "Do you have a problem with your vision?",
+    "type": "yesno",
+    "concern": "Vision",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "hearing_problem",
+    "section": "Staying Healthy",
+    "text": "Do you have a problem with your hearing?",
+    "type": "yesno",
+    "concern": "Hearing",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "teeth_problem",
+    "section": "Staying Healthy",
+    "text": "Do you have a problem with your teeth?",
+    "type": "yesno",
+    "concern": "Teeth and mouth",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "foot_problem",
+    "section": "Staying Healthy",
+    "text": "Do you have a problem with your feet?",
+    "type": "yesno",
+    "concern": "Foot problems",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "falls_3_months",
+    "section": "Staying Healthy",
+    "text": "Have you had any falls in the last 3 months?",
+    "type": "yesno",
+    "concern": "Falls",
+    "trigger": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "falls_frequency",
+    "section": "Staying Healthy",
+    "text": "Have you had 2 or more falls in the last 3 months?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "falls_3_months",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Falls",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "falls_get_up",
+    "section": "Staying Healthy",
+    "text": "Have you had any difficulty getting up off the floor after a fall?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "falls_3_months",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Falls",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "diet_concern",
+    "section": "Staying Healthy",
+    "text": "Do you have any concerns about your diet or nutrition?",
+    "type": "yesno",
+    "concern": "Diet and nutrition",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "lost_3kg",
+    "section": "Staying Healthy",
+    "text": "Have you unintentionally lost 3kg in weight over the last three months?",
+    "type": "yesno",
+    "concern": "Unintentional weight loss",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "regular_exercise",
+    "section": "Staying Healthy",
+    "text": "Do you take regular exercise?",
+    "type": "positive_yesno",
+    "concern": "Exercise and movement",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "vaccinations",
+    "section": "Staying Healthy",
+    "text": "Are you up to date with your vaccinations?",
+    "type": "positive_yesno",
+    "concern": "Vaccinations",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "bp_checked",
+    "section": "Staying Healthy",
+    "text": "Has your blood pressure been checked in the last year?",
+    "type": "positive_yesno",
+    "concern": "Blood pressure",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "shopping",
+    "section": "Independence",
+    "text": "Are you able to do your shopping?",
+    "type": "positive_yesno",
+    "concern": "Shopping",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "dressing",
+    "section": "Independence",
+    "text": "Can you dress yourself?",
+    "type": "positive_yesno",
+    "concern": "Dressing",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "bathing",
+    "section": "Independence",
+    "text": "Are you able to use a bath or shower by yourself?",
+    "type": "positive_yesno",
+    "concern": "Bathing or showering",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "incontinence",
+    "section": "Independence",
+    "text": "Do you have problems with your bladder, such as accidental leakage of urine, most days?",
+    "type": "yesno",
+    "concern": "Bladder control",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "toileting",
+    "section": "Independence",
+    "text": "Can you use the toilet (or commode)?",
+    "type": "positive_yesno",
+    "concern": "Using the toilet",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "transfers",
+    "section": "Independence",
+    "text": "Can you move yourself from bed to chair, if they are next to each other?",
+    "type": "positive_yesno",
+    "concern": "Moving between bed and chair",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "indoors",
+    "section": "Independence",
+    "text": "Can you get around indoors?",
+    "type": "positive_yesno",
+    "concern": "Getting around indoors",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_problem",
+    "section": "Wellbeing",
+    "text": "Do you have problems with the place where you live?",
+    "type": "yesno",
+    "concern": "Your home",
+    "trigger": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_safe",
+    "section": "Wellbeing",
+    "text": "Do you have concerns because of your safety and security where you live?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "accommodation_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Your home",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_suitable",
+    "section": "Wellbeing",
+    "text": "Do you have concerns because of the condition of your home?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "accommodation_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Your home",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_access",
+    "section": "Wellbeing",
+    "text": "Do you have concerns because of the location of your home?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "accommodation_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Your home",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_warmth",
+    "section": "Wellbeing",
+    "text": "Do you have concerns because of the costs of your housing?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "accommodation_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Your home",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_maintenance",
+    "section": "Wellbeing",
+    "text": "Do you have concerns because of the repair and maintenance of your home?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "accommodation_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Your home",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "accommodation_stability",
+    "section": "Wellbeing",
+    "text": "Do you have concerns because of managing to live independently where you are?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "accommodation_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Your home",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "finance_problem",
+    "section": "Wellbeing",
+    "text": "Do you have problems with your finances?",
+    "type": "yesno",
+    "concern": "Finances",
+    "trigger": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "finance_essentials",
+    "section": "Wellbeing",
+    "text": "In general, do your finances work out at the end of the month?",
+    "type": "positive_yesno",
+    "show_if": [
+      {
+        "id": "finance_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Finances",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "finance_unexpected",
+    "section": "Wellbeing",
+    "text": "Are you able to manage your money and financial affairs?",
+    "type": "positive_yesno",
+    "show_if": [
+      {
+        "id": "finance_problem",
+        "value": "Yes"
+      }
+    ],
+    "follow_up": "Finances",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "participation_ok",
+    "section": "Wellbeing",
+    "text": "Are you able to pursue leisure interests, hobbies, work and learning activities which are important to you?",
+    "type": "positive_yesno",
+    "concern": "Activities and interests",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "lonely",
+    "section": "Wellbeing",
+    "text": "Do you often feel lonely?",
+    "type": "yesno",
+    "concern": "Loneliness",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "sleep_trouble",
+    "section": "Wellbeing",
+    "text": "Have you had any trouble sleeping in the last month?",
+    "type": "yesno",
+    "concern": "Sleep",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "moderate_pain",
+    "section": "Wellbeing",
+    "text": "Do you suffer from moderate or severe pain, most days?",
+    "type": "yesno",
+    "concern": "Pain",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "down_depressed",
+    "section": "Wellbeing",
+    "text": "During the last month, have you often been bothered by feeling down, depressed or hopeless?",
+    "type": "yesno",
+    "concern": "Low mood",
+    "trigger": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "little_interest",
+    "section": "Wellbeing",
+    "text": "During the last month, have you often been bothered by having little interest or pleasure in doing things?",
+    "type": "yesno",
+    "concern": "Loss of interest",
+    "trigger": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_satisfied",
+    "section": "Wellbeing",
+    "text": "Are you basically satisfied with your life?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_dropped_activities",
+    "section": "Wellbeing",
+    "text": "Have you dropped many of your activities and interests?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_empty",
+    "section": "Wellbeing",
+    "text": "Do you feel that your life is empty?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_bored",
+    "section": "Wellbeing",
+    "text": "Do you often get bored?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_good_spirits",
+    "section": "Wellbeing",
+    "text": "Are you in good spirits most of the time?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_afraid",
+    "section": "Wellbeing",
+    "text": "Are you afraid that something bad is going to happen to you?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_happy",
+    "section": "Wellbeing",
+    "text": "Do you feel happy most of the time?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_helpless",
+    "section": "Wellbeing",
+    "text": "Do you often feel helpless?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_stay_home",
+    "section": "Wellbeing",
+    "text": "Do you prefer to stay at home, rather than going out and doing new things?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_memory",
+    "section": "Wellbeing",
+    "text": "Do you feel you have more problems with memory than most?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_wonderful_alive",
+    "section": "Wellbeing",
+    "text": "Do you think it is wonderful to be alive now?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_worthless",
+    "section": "Wellbeing",
+    "text": "Do you feel pretty worthless the way you are now?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_energy",
+    "section": "Wellbeing",
+    "text": "Do you feel full of energy?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_hopeless",
+    "section": "Wellbeing",
+    "text": "Do you feel that your situation is hopeless?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "gds_better_off",
+    "section": "Wellbeing",
+    "text": "Do you think that most people are better off than you are?",
+    "type": "yesno",
+    "show_if": [
+      {
+        "id": "down_depressed",
+        "value": "Yes"
+      },
+      {
+        "id": "little_interest",
+        "value": "Yes"
+      }
+    ],
+    "show_if_mode": "any",
+    "follow_up": "Mood",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "forgetting",
+    "section": "Wellbeing",
+    "text": "In the past year, have you noticed forgetting things more than usual?",
+    "type": "yesno",
+    "concern": "Memory",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "confused_day_place",
+    "section": "Wellbeing",
+    "text": "Do you sometimes feel confused about what day it is or where you are?",
+    "type": "yesno",
+    "concern": "Confusion",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "memory_concern_other",
+    "section": "Wellbeing",
+    "text": "Has anyone close to you raised concerns about your memory or thinking?",
+    "type": "yesno",
+    "concern": "Memory or thinking",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  }
+]

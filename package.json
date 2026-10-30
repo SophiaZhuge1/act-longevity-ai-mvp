@@ -8,7 +8,8 @@
     "build": "vite build",
     "setup:backend": "python3 -m venv .venv && .venv/bin/python -m pip install -r backend/requirements.txt",
     "backend": ".venv/bin/python backend/app.py",
-    "start": "concurrently \"npm run backend\" \"npm run dev\""
+    "start": "concurrently \"npm run backend\" \"npm run dev\"",
+    "build:pages": "python3 scripts/build_pages.py"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

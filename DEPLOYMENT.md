@@ -1,3 +1,29 @@
+# GitHub Pages browser edition
+
+The mobile-friendly browser edition is published from the `gh-pages` branch at:
+https://SophiaZhuge1.github.io/act-longevity-ai-mvp/
+
+The mobile viewer is at `mobile-preview.html` relative to the site root.
+
+Build with `npm run build:pages` (Python 3 and Node are required). This exports the
+questionnaire from the shared Python source, builds Vite with the repository base
+path, and adds `.nojekyll`. Set `NODE_BINARY` when a custom Node path is needed.
+Only the contents of `dist/` belong on the publishing branch. Do not publish
+`.env`, member records, screenshots, temporary outputs, or local databases.
+
+The Pages edition runs the existing scoring and resource-selection Python in the
+visitor’s browser using pinned Pyodide 314.0.7 from jsDelivr. Initial scoring needs
+a network download. Answers are processed in memory; repeat-assessment progress
+lasts for the current tab only. It does not call the Python backend, collect a
+waitlist, email reports, authenticate accounts, or provide AI chat. Visitors can
+use their browser’s Print option to save their plan as a PDF. Insurance and
+Holland & Barrett links work without sharing the profile with providers.
+
+Enable the site in repository Settings > Pages, choose “Deploy from a branch”,
+and select `gh-pages` with `/ (root)`.
+
+---
+
 # Free Hosted Test Deployment
 
 Recommended testing setup: **Render Free Web Service + MongoDB Atlas Free Cluster**.
